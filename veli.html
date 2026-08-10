@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Takip - Veli Bilgi Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .sorgu-karti { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .sonuc-kutusu { display: none; margin-top: 20px; padding: 20px; border-radius: 10px; border: 2px solid #e9ecef; background-color: #f8f9fa; }
+        .kalan-sayi { font-size: 3rem; font-weight: bold; color: #0d6efd; line-height: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="sorgu-karti">
+        <h4 class="mb-2 fw-bold text-dark">Veli Bilgi Sistemi</h4>
+        <p class="text-muted small mb-4">Öğrencinizin kalan ders bilgisini görmek için TC Kimlik numarasını giriniz.</p>
+        
+        <input type="text" id="tcInput" class="form-control form-control-lg mb-3 text-center" placeholder="11 Haneli TC Kimlik No" maxlength="11">
+        
+        <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="sorgula()" id="sorguBtn">Sorgula</button>
+
+        <div id="hataMesaji" class="text-danger mt-3 fw-bold" style="display: none;"></div>
+
+        <div class="sonuc-kutusu" id="sonucKutusu">
+            <h5 class="fw-bold mb-1 text-dark" id="ogrAd">--</h5>
+            <span class="badge bg-secondary mb-3" id="ogrGrup">-- Grubu</span>
+            <p class="mb-1 text-muted fw-bold">Kalan Ders Sayısı</p>
+            <div class="kalan-sayi" id="ogrKalan">0</div>
+        </div>
+    </div>
+
+    <script>
+        // Admin panelindeki aynı gün/tarih hesaplama mantığı
+        function isGecerliGun(tarih, grup) {
+            let gun = tarih.getDay();
+            if (!grup) return false;
+            // DİKKAT: Hafta içi günlerin Salı(2)-Perşembe(4) ise burası böyle kalsın. Farklıysa burayı admin panelindeki gibi değiştir.
+            if (grup.startsWith("HS")) return gun === 0 || gun === 6; 
+            else return gun === 2 || gun === 4; 
+        }
+
+        function kalanDersiBul(ilkDersTarihi, paket, grup) {
+            let bugun = new Date(); bugun.setHours(0,0,0,0);
+            let tempTarih = new Date(ilkDersTarihi); tempTarih.setHours(0,0,0,0);
+            let gecenDers = 0;
+            
+            while(tempTarih <= bugun && gecenDers < paket) {
+                if(isGecerliGun(tempTarih, grup)) gecenDers++;
+                tempTarih.setDate(tempTarih.getDate() + 1);
+            }
+            let kalan = paket - gecenDers;
+            return kalan < 0 ? 0 : kalan;
+        }
+
+        async function sorgula() {
+            let tc = document.getElementById('tcInput').value.trim();
+            let btn = document.getElementById('sorguBtn');
+            let hata = document.getElementById('hataMesaji');
+            let sonuc = document.getElementById('sonucKutusu');
+
+            hata.style.display = 'none';
+            sonuc.style.display = 'none';
+
+            if (tc.length !== 11) {
+                hata.innerText = "Lütfen 11 haneli geçerli bir TC Kimlik No giriniz.";
+                hata.style.display = 'block';
+                return;
+            }
+
+            btn.innerText = "Sorgulanıyor...";
+            btn.disabled = true;
+
+            try {
+                let response = await fetch('https://okanjimnastik.pythonanywhere.com/veli-sorgu', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tc_kimlik: tc })
+                });
+
+                let data = await response.json();
+
+                if (data.durum) {
+                    let ogr = data.ogrenci;
+                    
+                    // İlk dersi bul
+                    let ilkDers = new Date(ogr.kayitTarihiHam);
+                    while (!isGecerliGun(ilkDers, ogr.grup)) ilkDers.setDate(ilkDers.getDate() + 1);
+                    
+                    // Kalan dersi hesapla
+                    let kalan = kalanDersiBul(ilkDers, ogr.paket, ogr.grup);
+
+                    document.getElementById('ogrAd').innerText = ogr.ad;
+                    document.getElementById('ogrGrup').innerText = ogr.grup;
+                    document.getElementById('ogrKalan').innerText = kalan;
+                    
+                    // Renk ayarı
+                    let kalanSayiRenk = document.getElementById('ogrKalan');
+                    kalanSayiRenk.style.color = kalan <= 2 ? "#dc3545" : "#0d6efd"; // 2 ve altıysa kırmızı yap
+
+                    sonuc.style.display = 'block';
+                } else {
+                    hata.innerText = data.mesaj || "Kayıt bulunamadı.";
+                    hata.style.display = 'block';
+                }
+            } catch (error) {
+                hata.innerText = "Sisteme bağlanılamadı. Lütfen internetinizi kontrol edin.";
+                hata.style.display = 'block';
+            }
+
+            btn.innerText = "Sorgula";
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
