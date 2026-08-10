@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahsilat Detayları</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>body { background-color: #f8f9fa; }</style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-success fw-bold">Tahsilat Detayları</h2>
+    <div class="d-flex align-items-center">
+        <input type="text" id="tahsilatArama" class="form-control me-3 border-success shadow-sm" 
+               placeholder="🔍 Tahsilat Ara..." onkeyup="tahsilatVerileriniCek()" style="max-width: 250px;">
+        <button class="btn btn-secondary fw-bold" onclick="window.close()">Kapat</button>
+    </div>
+</div>
+
+        <div class="card p-4 shadow-sm mb-5 border-success border-top border-4">
+            <h4 class="text-success mb-3">✅ Ödemesi Alınanlar</h4>
+            <table class="table table-hover align-middle">
+                <thead class="table-success">
+                    <tr>
+                         <th>Ad Soyad</th>
+                         <th>Grup</th>
+                         <th>Kayıt Tarihi</th>
+                         <th>Toplam Tutar</th> 
+                         <th>Ödeme Durumu</th>
+                         <th>Alınan (₺)</th>
+                         <th>Kalan (₺)</th>
+                         <th>Ödeme Şekli</th>
+                         <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="odemeYapanlarListesi"></tbody>
+            </table>
+        </div>
+
+        <div class="card p-4 shadow-sm border-danger border-top border-4">
+            <h4 class="text-danger mb-3">❌ Ödeme Beklenenler</h4>
+            <table class="table table-hover align-middle">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Ad Soyad</th>
+                        <th>Grup</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>Tutar</th>
+                        <th>Ödeme Durumu</th>
+                        <th>Alınan (₺)</th>
+                        <th>Kalan (₺)</th>
+                        <th>Ödeme Şekli</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="borclularListesi"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        // Öğrencileri hafızada tutmak için global değişken
+        window.tumOgrenciler = [];
+
+        window.addEventListener('DOMContentLoaded', tahsilatVerileriniCek);
+
+        async function tahsilatVerileriniCek() {
+    let yListesi = document.getElementById('odemeYapanlarListesi');
+    let bListesi = document.getElementById('borclularListesi');
+    
+    // Arama kutusundaki metni al
+    let aranan = document.getElementById('tahsilatArama') ? document.getElementById('tahsilatArama').value.toLowerCase().trim() : "";
+
+    try {
+        let response = await fetch('https://okanjimnastik.pythonanywhere.com/ogrenciler?t=' + Date.now());
+        let ogrenciler = await response.json();
+        window.tumOgrenciler = ogrenciler;
+
+        yListesi.innerHTML = "";
+        bListesi.innerHTML = "";
+
+        ogrenciler.forEach(ogr => {
+            // ARAMA FİLTRESİ: Eğer isim yazılan metni içermiyorsa bu öğrenciyi atla
+            if (aranan !== "" && !ogr.ad.toLowerCase().includes(aranan)) {
+                return; 
+            }
+
+            let tarih = new Date(ogr.kayitTarihiHam).toLocaleDateString('tr-TR');
+            let odemeRozeti = ogr.odeme === 'Tamamı Alındı' ? 'bg-success' : (ogr.odeme === 'Kısmi Ödeme' ? 'bg-warning text-dark' : 'bg-danger');
+            let toplamTutar = ogr.ucret || (parseFloat(ogr.alinan_odeme || 0) + parseFloat(ogr.kalan_odeme || 0));
+
+            let satir = `<tr>
+                <td><strong>${ogr.ad}</strong></td>
+                <td>${ogr.grup}</td>
+                <td>${tarih}</td>
+                <td class="text-primary"><strong>${toplamTutar} ₺</strong></td>
+                <td><span class="badge ${odemeRozeti}">${ogr.odeme || "-"}</span></td>
+                <td class="text-success fw-bold">${ogr.alinan_odeme || 0} ₺</td>
+                <td class="text-danger fw-bold">${ogr.kalan_odeme || 0} ₺</td>
+                <td><span class="badge bg-secondary">${ogr.odeme_sekli || "-"}</span></td>
+                <td>
+                    ${(ogr.odeme === "Ödeme Alındı" || ogr.odeme === "Tamamı Alındı") 
+                        ? '<button class="btn btn-sm btn-outline-secondary border-0 fs-5">-</button>' 
+                        : `<button class="btn btn-sm btn-outline-danger border-0 fs-5" onclick="tahsilatGir(${ogr.id})">💰</button>`
+                    }
+                </td>
+            </tr>`;
+
+            if(ogr.odeme === "Ödeme Alındı" || ogr.odeme === "Tamamı Alındı") {
+                yListesi.innerHTML += satir;
+            } else {
+                bListesi.innerHTML += satir;
+            }
+        });
+
+    } catch (error) {
+        console.error("Hata:", error);
+    }
+}
+        // YENİ EKLENEN TAHSİLAT HESAPLAMA MOTORU
+        async function tahsilatGir(id) {
+            // 1. Öğrenciyi hafızadan bul
+            let ogr = window.tumOgrenciler.find(o => o.id === id);
+            if(!ogr) return;
+
+            // 2. Kutucuğu aç ve tutarı sor
+            let girilenMiktar = prompt(`Bakiye: ${ogr.kalan_odeme} ₺\n\n${ogr.ad} adlı öğrenciden ne kadar tahsilat yapıldı? (Sadece sayı girin):`, "0");
+            
+            // Eğer iptale basıldıysa veya boş bırakıldıysa işlemi durdur
+            if(girilenMiktar === null || girilenMiktar.trim() === "") return;
+
+            let eklenenTutar = parseFloat(girilenMiktar);
+            if(isNaN(eklenenTutar) || eklenenTutar <= 0) {
+                alert("Lütfen geçerli bir tutar giriniz!");
+                return;
+            }
+
+            // 3. Matematiksel hesaplamaları yap
+            let toplamTutar = ogr.ucret || (parseFloat(ogr.alinan_odeme || 0) + parseFloat(ogr.kalan_odeme || 0));
+            let eskiAlinan = parseFloat(ogr.alinan_odeme || 0);
+            
+            let yeniAlinan = eskiAlinan + eklenenTutar;
+            let yeniKalan = toplamTutar - yeniAlinan;
+
+            // Eğer borçtan fazla para girildiyse kalanı sıfıra sabitle (eksiye düşmesin)
+            if(yeniKalan < 0) yeniKalan = 0;
+
+            // 4. Yeni duruma karar ver (Borç bittiyse Tamamı Alındı yap)
+            let yeniDurum = "Kısmi Ödeme";
+            if(yeniKalan <= 0) {
+                yeniDurum = "Tamamı Alındı";
+            }
+
+            // 5. Python sunucusuna gönderilmek üzere güncel paketi hazırla
+            let guncelVeri = {
+                ad: ogr.ad,
+                grup: ogr.grup,
+                paket: ogr.paket,
+                kayitTarihiHam: ogr.kayitTarihiHam,
+                alinan_odeme: yeniAlinan,
+                kalan_odeme: yeniKalan,
+                odeme_sekli: ogr.odeme_sekli || "Nakit",
+                odeme: yeniDurum,
+                bitis_tarihi: ogr.bitis_tarihi || ""
+            };
+
+            try {
+                // 6. Güncellemeyi arka plana (veritabanına) gönder
+                let response = await fetch('https://okanjimnastik.pythonanywhere.com/ogrenci_guncelle/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(guncelVeri)
+                });
+
+                if(response.ok) {
+                    // Kayıt başarılıysa sayfayı (tabloları) yenile
+                    tahsilatVerileriniCek();
+                } else {
+                    alert("Kayıt güncellenirken bir hata oluştu!");
+                }
+            } catch(e) {
+                console.error(e);
+                alert("Sunucuya ulaşılamadı!");
+            }
+        }
+    </script>
+</body>
+</html>
