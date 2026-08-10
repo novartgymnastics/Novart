@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş | Cimnastik Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background-color: #f8f9fa; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .login-card { 
+            width: 100%; 
+            max-width: 400px; 
+            border-radius: 15px; 
+            border: none; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            padding: 30px; 
+            background: white; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h3 class="text-center text-primary mb-4"><strong>Sisteme Giriş</strong></h3>
+        
+        <div id="hataMesaji" class="alert alert-danger d-none text-center" role="alert"></div>
+
+        <form id="girisFormu">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Kullanıcı Adı</label>
+                <input type="text" class="form-control" id="kadi" placeholder="Örn: admin" required autocomplete="off">
+            
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Şifre</label>
+                <input type="password" class="form-control" id="sifre" placeholder="******" required autocomplete="off">
+                
+            </div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Giriş Yap</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('girisFormu').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Sayfa yenilenmesini durdur
+
+            let kadi = document.getElementById('kadi').value;
+            let sifre = document.getElementById('sifre').value;
+            let hataKutusu = document.getElementById('hataMesaji');
+
+            try {
+                // YAZDIĞIMIZ PYTHON SUNUCUSUNA (BACKEND) BİLGİ GÖNDERİYORUZ
+                let tepki = await fetch('https://okanjimnastik.pythonanywhere.com/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kadi: kadi, sifre: sifre })
+                });
+
+                let sonuc = await tepki.json(); // Python'dan gelen cevabı al
+
+                if (sonuc.durum === true) {
+                    // Şifre doğruysa ufak bir giriş anahtarı oluştur ve ana sayfaya yönlendir
+                    localStorage.setItem('girisIzinBelgesi', 'onaylandi');
+                    window.location.href = 'index.html';
+                } else {
+                    // Şifre yanlışsa uyarı ver
+                    hataKutusu.innerText = sonuc.mesaj;
+                    hataKutusu.classList.remove('d-none');
+                }
+            } catch (hata) {
+                hataKutusu.innerText = "Sunucuya bağlanılamadı! (app.py açık mı?)";
+                hataKutusu.classList.remove('d-none');
+            }
+        });
+    </script>
+</body>
+</html>
