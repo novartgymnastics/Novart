@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Yönetim Paneli - Novart</title>
+    <!-- Bootstrap (Mevcut sitendekiyle aynı tasarımı korumak için) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-info text-white text-center py-3">
+                        <h4 class="mb-0">Yeni Branş Ekle</h4>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <form id="bransEkleForm">
+                            
+                            <!-- Branş Adı -->
+                            <div class="mb-3">
+                                <label for="bransAdi" class="form-label fw-bold">Branş Adı</label>
+                                <input type="text" class="form-control" id="bransAdi" placeholder="Örn: Cimnastik, Mobility..." required>
+                            </div>
+
+                            <!-- Kategori Seçimi -->
+                            <div class="mb-3">
+                                <label for="kategori" class="form-label fw-bold">Kategori</label>
+                                <select class="form-select" id="kategori" required>
+                                    <option value="" selected disabled>Kategori Seçiniz</option>
+                                    <option value="Grup Dersleri">Grup Dersleri</option>
+                                    <option value="Bireysel Dersler">Bireysel Dersler</option>
+                                </select>
+                            </div>
+
+                            <!-- Resim Yükleme Alanı -->
+                            <div class="mb-4">
+                                <label for="bransResmi" class="form-label fw-bold">Branş Görseli</label>
+                                <input class="form-control" type="file" id="bransResmi" accept="image/*" required>
+                                <div class="form-text">Lütfen kareye yakın (örn: 500x500) formatta bir resim seçin.</div>
+                            </div>
+
+                            <!-- Kaydet Butonu -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-info text-white fw-bold py-2">
+                                    Kaydet ve Sitede Yayınla
+                                </button>
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+<script>
+    document.getElementById('bransEkleForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Sayfanın yenilenmesini engelle
+
+        // Formdaki verileri paketle (resim dahil)
+        let formData = new FormData();
+        formData.append('bransAdi', document.getElementById('bransAdi').value);
+        formData.append('kategori', document.getElementById('kategori').value);
+        formData.append('bransResmi', document.getElementById('bransResmi').files[0]);
+
+        // Butonu "Yükleniyor..." yapalım ki arkadaşın beklediğini anlasın
+        let btn = document.querySelector('button[type="submit"]');
+        let orjinalYazi = btn.innerText;
+        btn.innerText = "Yükleniyor, lütfen bekleyin...";
+        btn.disabled = true;
+
+        // Python (Flask) tarafına gönder
+        try {
+            let response = await fetch('/brans_ekle', {
+                method: 'POST',
+                body: formData
+            });
+            
+            let sonuc = await response.json();
+            
+            if(sonuc.durum) {
+                alert("Harika! " + sonuc.mesaj);
+                document.getElementById('bransEkleForm').reset(); // Formu temizle
+            } else {
+                alert("Hata: " + sonuc.mesaj);
+            }
+        } catch (hata) {
+            alert("Sunucuya bağlanılamadı!");
+        } finally {
+            // Butonu eski haline getir
+            btn.innerText = orjinalYazi;
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
