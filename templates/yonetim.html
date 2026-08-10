@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Üye Takip Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 10px; border: none; }
+        
+        /* Yanıp sönme animasyonu ve sağa sabitlenen buton */
+        @keyframes blinker { 50% { opacity: 0.3; } }
+        .uyari-butonu {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1050;
+            border-radius: 10px 0 0 10px;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding: 15px 5px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .yanip-sonen { animation: blinker 1.2s linear infinite; }
+        /* ÖZEL ŞIK BİLDİRİM KUTUSU */
+        #ozelBildirim {
+            position: fixed;
+            top: 20px;
+            right: -350px; /* Başlangıçta ekranın sağında gizli durur */
+            width: 300px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1060;
+            transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Hafif yaylanarak ekrana girer */
+            overflow: hidden;
+        }
+        #ozelBildirim.goster { right: 20px; }
+        
+        .bildirim-icerik {
+            padding: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bildirim-cubuk {
+            height: 4px;
+            background-color: #198754; /* Başarılı yeşili */
+            width: 100%;
+        }
+        .bildirim-cubuk.animasyon {
+            animation: cubukEri 2.5s linear forwards;
+        }
+        
+        /* Çizginin sağdan sola erime animasyonu */
+        @keyframes cubukEri {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+        /* GİZLEME BUTONU TASARIMI */
+        .gizle-buton { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            cursor: pointer; 
+            background: rgba(255,255,255,0.25); 
+            border: none; 
+            border-radius: 5px; 
+            padding: 3px 8px;
+            font-size: 0.9rem;
+            color: white; 
+            transition: 0.3s; 
+            z-index: 10;
+        }
+        .gizle-buton:hover { background: rgba(255,255,255,0.5); transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-secondary text-white fw-bold uyari-butonu" data-bs-toggle="offcanvas" data-bs-target="#uyariPaneli" id="uyariGostergeButonu">
+        PAKETİ BİTECEKLER <span class="badge bg-light text-dark mt-2" id="uyariSayaci" style="writing-mode: horizontal-tb;">0</span>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="uyariPaneli" aria-labelledby="uyariPaneliLabel">
+        <div class="offcanvas-header bg-danger text-white">
+            <h5 class="offcanvas-title fw-bold" id="uyariPaneliLabel">🚨 Yaklaşan Bitişler</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+        </div>
+        <div class="offcanvas-body" id="uyariListesi">
+            <p class="text-muted small mb-0 mt-3 text-center">Şu an bitmek üzere olan paket yok.</p>
+        </div>
+    </div>
+    <div id="ozelBildirim">
+        <div class="bildirim-icerik">
+            <span class="fs-4">✅</span>
+            <span id="bildirimMetni" class="fw-bold"></span>
+        </div>
+        <div class="bildirim-cubuk" id="bildirimCubugu"></div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary mb-0"><strong>Üye Takip Yönetim Paneli</strong></h2>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#sifreModal" title="Şifre Değiştir">
+                    ⚙️ Ayarlar
+                </button>
+                <button class="btn btn-outline-secondary fw-bold shadow-sm" onclick="hepsiniGizleGoster()" id="btnGenelGizle">
+                    <i class="bi bi-eye-slash"></i>  
+                </button>
+                <button class="btn btn-danger fw-bold shadow-sm" onclick="cikisYap()" title="Sistemden Güvenli Çıkış Yap">
+                    🚪 Çıkış
+                </button>
+            </div>
+        </div>
+        
+
+        <div class="row mb-4 text-center">
+            <div class="col-md-3" style="cursor: pointer;" onclick="window.open('ogrenciler.html', '_blank')">
+                <div class="card bg-info text-white p-3 shadow-sm" title="Listeyi Görmek İçin Tıklayın">
+                    <h6>Aktif Öğrenci 🔍</h6>
+                    <h3 id="toplamOgrenci">0</h3>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-success text-white p-3 shadow-sm" style="cursor: pointer; position: relative;" onclick="window.open('tahsilat.html', '_blank')" title="Tahsilat Detaylarını Gör">
+                    <button class="gizle-buton" onclick="event.stopPropagation(); degerGizleGoster('toplamTahsilat', this)" title="Gizle/Göster">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <h6>Toplam Tahsilat 💰</h6><h3 id="toplamTahsilat" data-gizli="false">0 ₺</h3>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-danger text-white p-3 shadow-sm" style="cursor: pointer; position: relative;" onclick="window.open('giderler.html', '_blank')" title="Gider Ekle ve Detayları Gör">
+                    <button class="gizle-buton" onclick="event.stopPropagation(); degerGizleGoster('toplamGider', this)" title="Gizle/Göster">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <h6>Toplam Gider 📉</h6><h3 id="toplamGider" data-gizli="false">0 ₺</h3>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card bg-primary text-white p-3 shadow-sm" style="position: relative;">
+                    <button class="gizle-buton" onclick="degerGizleGoster('netKar', this)" title="Gizle/Göster">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <h6>Net Kâr 📊</h6><h3 id="netKar" data-gizli="false">0 ₺</h3>
+                </div>
+            </div>
+        </div>
+        <form id="kayitFormu">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Ad Soyad</label>
+                        <input type="text" class="form-control" id="adSoyad" required>
+                    </div>
+                    <div class="mb-3">
+    <label class="form-label fw-bold">TC Kimlik No</label>
+    <input type="text" class="form-control" id="tcKimlik" placeholder="11 Haneli TC Giriniz" maxlength="11">
+</div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Doğum Tarihi</label>
+                        <input type="date" class="form-control" id="dogumTarihi">
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Grup Seçimi</label>
+                        <select class="form-select" id="grup" required>
+                            <option value="">Grup Seçiniz...</option>
+                            <option value="HS-1">HS Grubu 1</option>
+                            <option value="HS-2">HS Grubu 2</option>
+                            <option value="HS-3">HS Grubu 3</option>
+                            <option value="HS-4">HS Grubu 4</option>
+                            <option value="HS-5">HS Grubu 5</option>
+                            <option value="HS-6">HS Grubu 6</option>
+                            <option value="HS-7">HS Grubu 7</option>
+                            <option value="HS-8">HS Grubu 8</option>
+                            <option value="HI">HI Grubu</option>
+                            <option value="Özel">Özel Ders</option>
+                            <option value="E10">E10 Grubu</option>
+                            <option value="E11">E11 Grubu</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Paket Türü</label>
+                        <select class="form-select" id="paket" required>
+                            <option value="">Paket Seçiniz...</option>
+                            <option value="8">8 Saatlik Paket</option>
+                            <option value="24">24 Saatlik Paket</option>
+                            <option value="36">36 Saatlik Paket</option> 
+                            <option value="48">48 Saatlik Paket</option> 
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Kayıt Tarihi</label>
+                        <input type="date" class="form-control" id="kayitTarihi" required>
+                    </div>
+                    <div class="col-md-6 mb-3 d-none">
+    <label class="form-label fw-bold">Manuel Bitiş Tarihi <br><small class="text-danger fw-normal">(Sadece Mazeret Varsa Doldurun)</small></label>
+    <input type="date" class="form-control border-warning" id="manuelBitisTarihi">
+</div>
+                    
+                    <div class="col-md-3 mb-3">
+    <label class="form-label fw-bold text-success">Alınan Ödeme (₺)</label>
+    <input type="number" class="form-control" id="alinanOdeme" placeholder="0">
+</div>
+
+<div class="col-md-3 mb-3">
+    <label class="form-label fw-bold text-danger">Kalan Borç (₺)</label>
+    <input type="number" class="form-control" id="kalanOdeme" placeholder="0">
+</div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Ödeme Şekli</label>
+                        <select class="form-select" id="odemeSekli" required>
+                            <option value="">Seçiniz...</option>
+                            <option value="Nakit">Nakit</option>
+                            <option value="Havale/EFT">Havale/EFT</option>
+                            <option value="Kredi Kartı">Kredi Kartı</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Ödeme Durumu</label>
+                        <select class="form-select" id="odemeDurumu" required>
+                            <option value="Tamamı Alındı">Tamamı Alındı</option>
+                            <option value="Kısmi Ödeme">Kısmi Ödeme</option>
+                            <option value="Ödeme Bekliyor">Ödeme Bekliyor</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold mt-2 py-2 fs-5">Sisteme Kaydet</button>
+            </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // YENİ PAKET TANIMLAMA YAKALAYICISI
+        let duzenlenenOgrenciId = null; // Başlangıçta kimse düzenlenmiyor
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // 1. YENİ PAKET TANIMLAMA YAKALAYICISI (Eski özellik)
+            let eskiOgrenci = localStorage.getItem('yenileyecekOgrenci');
+            if (eskiOgrenci) {
+                document.getElementById('adSoyad').value = eskiOgrenci;
+                if(typeof bildirimGoster === "function") bildirimGoster("🔄 " + eskiOgrenci + " için yeni paket tanımlanıyor...");
+                document.getElementById('grup').focus();
+                localStorage.removeItem('yenileyecekOgrenci');
+            }
+
+            // 2. ÖĞRENCİ DÜZENLEME YAKALAYICISI (Yeni özellik)
+            let duzenlenecek = localStorage.getItem('duzenlenecekOgrenci');
+            if (duzenlenecek) {
+                let ogr = JSON.parse(duzenlenecek);
+                duzenlenenOgrenciId = ogr.id; // Sistemi güncelleme moduna sokar
+                
+                // Formdaki tüm kutuları öğrencinin bilgileriyle doldur
+                document.getElementById('adSoyad').value = ogr.ad;
+                document.getElementById('grup').value = ogr.grup;
+                document.getElementById('paket').value = ogr.paket;
+                document.getElementById('kayitTarihi').value = ogr.kayitTarihiHam;
+                document.getElementById('alinanOdeme').value = ogr.alinan_odeme;
+                document.getElementById('kalanOdeme').value = ogr.kalan_odeme;
+                document.getElementById('odemeSekli').value = ogr.odeme_sekli;
+                document.getElementById('odemeDurumu').value = ogr.odeme;
+                
+                // Kaydet butonunu "Güncelle" olarak değiştir
+                document.querySelector('#kayitFormu button[type="submit"]').innerText = "Bilgileri Güncelle";
+                document.querySelector('#kayitFormu button[type="submit"]').classList.replace('btn-primary', 'btn-warning');
+                
+                if(typeof bildirimGoster === "function") bildirimGoster("✏️ " + ogr.ad + " bilgileri düzenleniyor...");
+                localStorage.removeItem('duzenlenecekOgrenci'); // Hafızayı temizle
+            }
+        });
+        // GÜVENLİK KONTROLÜ: Giriş izni yoksa Login sayfasına geri şutla!
+        if (localStorage.getItem('girisIzinBelgesi') !== 'onaylandi') {
+            window.location.href = 'login.html';
+        }
+
+        // Global öğrenci listemiz (Artık Python'dan dolacak)
+        let ogrenciler = [];
+
+        // 1. PYTHON'DAN (VERİTABANINDAN) VERİLERİ ÇEK
+       // 1. VERİ ÇEKME MOTORU (Muhasebe bozulmasın diye herkesi çekiyoruz)
+        async function verileriCek() {
+            try {
+                let response = await fetch('https://okanjimnastik.pythonanywhere.com/ogrenciler?t=' + Date.now());
+                let dbVerisi = await response.json();
+                
+                // Herkesi alıp sadece kalan derslerini hesaplıyoruz (Arşivlileri burada silmiyoruz)
+                ogrenciler = dbVerisi.map(ogr => {
+                    let tarihler = tarihleriHesapla(ogr.kayitTarihiHam, ogr.paket, ogr.grup);
+                    let kalan = kalanDersiBul(tarihler.ilkDers, ogr.paket, ogr.grup);
+                    return { ...ogr, kalanDers: kalan };
+                });
+                
+                arayuzuGuncelle();
+            } catch (error) {
+                console.error("Veritabanına bağlanılamadı!", error);
+            }
+        }
+
+        // Sayfa açıldığında panelleri Python'dan güncelle
+        verileriCek();
+        window.addEventListener('focus', verileriCek);
+
+        // 2. YENİ KAYDI PYTHON'A (VERİTABANINA) GÖNDER
+        // 2. YENİ KAYDI VEYA GÜNCELLEMEYİ PYTHON'A GÖNDER
+        document.getElementById('kayitFormu').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+
+            let yeniOgrenci = {
+                ad: document.getElementById('adSoyad').value,
+                tc_kimlik: document.getElementById('tcKimlik').value, 
+                grup: document.getElementById('grup').value,
+                paket: parseInt(document.getElementById('paket').value), 
+                kayitTarihiHam: document.getElementById('kayitTarihi').value,
+                alinan_odeme: parseFloat(document.getElementById('alinanOdeme').value) || 0,
+                kalan_odeme: parseFloat(document.getElementById('kalanOdeme').value) || 0,
+                odeme_sekli: document.getElementById('odemeSekli').value,
+                odeme: document.getElementById('odemeDurumu').value
+            };
+
+            try {
+                // SİHİRLİ KISIM: Eğer bir öğrenci düzenleniyorsa ID'si vardır, yoksa yenidir.
+                let hedefUrl = duzenlenenOgrenciId ? 'https://okanjimnastik.pythonanywhere.com/ogrenci_guncelle/' + duzenlenenOgrenciId : 'https://okanjimnastik.pythonanywhere.com/ogrenci_ekle';
+                let islemMetodu = duzenlenenOgrenciId ? 'PUT' : 'POST';
+
+                let response = await fetch(hedefUrl, {
+                    method: islemMetodu,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(yeniOgrenci)
+                });
+
+                if (response.ok) {
+                    document.getElementById('kayitFormu').reset(); 
+                    
+                    // İşlem bitince butonu eski haline (Yeni Kayıt moduna) döndür
+                    let btn = document.querySelector('#kayitFormu button[type="submit"]');
+                    btn.innerText = "Sisteme Kaydet";
+                    btn.classList.replace('btn-warning', 'btn-primary');
+                    
+                    let mesajEki = duzenlenenOgrenciId ? " başarıyla GÜNCELLENDİ!" : " başarıyla kaydedildi!";
+                    if(typeof bildirimGoster === "function") {
+                        bildirimGoster(yeniOgrenci.ad + mesajEki);
+                    } else {
+                        alert(yeniOgrenci.ad + mesajEki);
+                    }
+                    
+                    // SİSTEMİ SIFIRLA: Kimliği temizle ki bir sonraki kayıt "Yeni Kayıt" olsun
+                    duzenlenenOgrenciId = null; 
+                    verileriCek(); // Sayıları hemen güncelle
+                }
+            } catch (hata) {
+                console.log("Kayıt/Güncelleme işleminde bağlantı gecikmesi:", hata);
+            }
+        });
+
+        // --- YARDIMCI VE MATEMATİKSEL FONKSİYONLAR ---
+        // BÜTÜN GRUPLAR HAFTADA 2 SAAT (2 GÜN) OLACAK ŞEKİLDE SABİTLENDİ
+        function isGecerliGun(tarih, grup) {
+            let gun = tarih.getDay(); 
+            
+            if (grup && grup.startsWith("HS")) {
+                return gun === 0 || gun === 6; // Hafta Sonu: Cmt(6) ve Paz(0)
+            } else if (grup === "HI") {
+                return gun === 2 || gun === 4; // Hafta İçi: Salı(2) ve Perşembe(4)
+            } else if (grup === "Ozel") {
+                return gun === 1 || gun === 4; // Özel: Pzt(1) ve Perş(4)
+            } else if (grup === "E10") {
+                return gun === 1 || gun === 3; // E10: Pzt(1) ve Çarş(3)
+            } else if (grup === "E11") {
+                return gun === 3 || gun === 5; // E11: Çarş(3) ve Cuma(5)
+            } else {
+                return gun === 2 || gun === 5; // Yeni bir grup eklenirse hata vermesin, haftada 2 gün saysın
+            }
+        }
+
+       function tarihleriHesapla(kayitTarihiStr, paket, grup) {
+            let kayit = new Date(kayitTarihiStr);
+            let gunIndex = kayit.getDay(); // 0: Pazar, 1: Pzt, 2: Salı, 3: Çarş, 4: Perş, 5: Cuma, 6: Cmt
+            
+            // Paket süresini hafta bazında hesaplıyoruz (Haftada 2 gün üzerinden)
+            // 8 saat = 4 hafta, 24 saat = 12 hafta, 48 saat = 24 hafta gibi...
+            let haftaSayisi = paket / 2; 
+            
+            let bitis = new Date(kayit);
+            
+            // --- HAFTA İÇİ GRUBU MANTIĞI ---
+            if (!grup.startsWith("HS")) {
+                if (gunIndex >= 1 && gunIndex <= 4) { 
+                    // 1. KURAL: Pzt-Perş arası kayıtlar -> 4 hafta sonraki CUMA biter
+                    bitis.setDate(bitis.getDate() + (haftaSayisi * 7));
+                    // O haftanın Cuma gününe (5) sabitle
+                    while(bitis.getDay() !== 5) bitis.setDate(bitis.getDate() + 1);
+                } 
+                else if (gunIndex === 5 || gunIndex === 6 || gunIndex === 0) { 
+                    // 2. KURAL: Cuma (veya boşta kalan hafta sonu) kayıtları -> 5 hafta sonraki PAZARTESİ biter
+                    bitis.setDate(bitis.getDate() + ((haftaSayisi + 1) * 7));
+                    // O haftanın Pazartesi gününe (1) sabitle
+                    while(bitis.getDay() !== 1) bitis.setDate(bitis.getDate() - 1);
+                }
+            } 
+            // --- HAFTA SONU GRUBU MANTIĞI ---
+            else {
+                if (gunIndex === 6) { 
+                    // 3. KURAL: Cumartesi kayıt olan -> 4 hafta sonraki PAZAR biter
+                    bitis.setDate(bitis.getDate() + (haftaSayisi * 7));
+                    while(bitis.getDay() !== 0) bitis.setDate(bitis.getDate() + 1);
+                } 
+                else if (gunIndex === 0 || (gunIndex >= 1 && gunIndex <= 5)) { 
+                    // 4. KURAL: Pazar kayıt olan -> 5 hafta sonraki CUMARTESİ biter
+                    bitis.setDate(bitis.getDate() + ((haftaSayisi + 1) * 7));
+                    while(bitis.getDay() !== 6) bitis.setDate(bitis.getDate() - 1);
+                }
+            }
+
+            // İlk ders gününü sistemin çalışma gününe göre ayarla (Görsel için)
+            let ilkDers = new Date(kayit);
+            while (!isGecerliGun(ilkDers, grup)) ilkDers.setDate(ilkDers.getDate() + 1);
+
+            return { ilkDers: ilkDers, bitisTarihi: bitis };
+        }
+
+        function kalanDersiBul(ilkDersTarihi, paket, grup) {
+            let bugun = new Date();
+            bugun.setHours(0,0,0,0);
+            let baslangic = new Date(ilkDersTarihi);
+            baslangic.setHours(0,0,0,0);
+
+            if (bugun < baslangic) return paket; 
+
+            let islenen = 0;
+            let geciciTarih = new Date(baslangic);
+
+            while (geciciTarih <= bugun && islenen < paket) {
+                if (isGecerliGun(geciciTarih, grup)) islenen++;
+                geciciTarih.setDate(geciciTarih.getDate() + 1);
+            }
+            return paket - islenen;
+        }
+
+        // --- ARAYÜZ (DASHBOARD) GÜNCELLEME ---
+       // --- ARAYÜZ (DASHBOARD) GÜNCELLEME ---
+        function arayuzuGuncelle() {
+            let uyariPanel = document.getElementById('uyariListesi');
+            let uyariButonu = document.getElementById('uyariGostergeButonu');
+            let uyariSayaci = document.getElementById('uyariSayaci');
+            
+            uyariPanel.innerHTML = ""; 
+            
+            let aktifOgrenciSayisi = 0;
+            let toplamKasa = 0;
+            let uyariSayisi = 0; 
+
+            ogrenciler.forEach(ogr => {
+                // 1. KASA HESABI: Öğrenci bitse de, arşive gitse de, SİLİNSE DE parası GİZLİCE kasada kalmalı!
+                toplamKasa += (ogr.alinan_odeme || 0);
+
+                // 🛑 2. GİZLEME KURALI: Eğer öğrenci Arşivlenmişse (Pasif) VEYA Kalıcı Silinmişse (TamamenSilindi), listeye sokma!
+                if (ogr.durum === 'Pasif' || ogr.durum === 'TamamenSilindi') return;
+
+                // 3. AKTİF ÖĞRENCİ SAYISI: Sadece dersi 0'dan büyük olanları (yani devam edenleri) say!
+                if (ogr.kalanDers > 0) {
+                    aktifOgrenciSayisi++;
+                }
+
+                // 3. SAĞ PANEL UYARI KISMI (Dersi 2 ve daha az kalanlar VEYA bitip hala arşive atılmayanlar)
+                if (ogr.kalanDers <= 2) {
+                    uyariSayisi++;
+                    let arkaPlan = ogr.kalanDers <= 0 ? "alert-danger" : "alert-warning";
+                    let mesaj = ogr.kalanDers <= 0 ? "Paketi Bitti!" : `Son ${ogr.kalanDers} Dersi Kaldı`;
+
+                    uyariPanel.innerHTML += `
+                        <div class="alert ${arkaPlan} p-2 mb-2 border-0 shadow-sm d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block fs-6">${ogr.ad}</strong>
+                                <span class="small text-muted">${ogr.grup} Grubu</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-dark mb-1">${mesaj}</span><br>
+                                <div class="d-flex justify-content-end gap-1">
+                                    <button class="btn btn-sm btn-success fw-bold py-1 px-2 shadow-sm" style="font-size: 0.8rem;" onclick="hizliPaketYenile('${ogr.ad}', '${ogr.grup}', ${ogr.paket})">Yeni Paket</button>
+                                    <button class="btn btn-sm btn-danger fw-bold py-1 px-2 shadow-sm" style="font-size: 0.8rem;" onclick="anaSayfadanArsivle(${ogr.id}, '${ogr.ad}')" title="Listeden Kaldır (Arşive Taşı)">Sil</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            uyariSayaci.innerText = uyariSayisi;
+
+            if (uyariSayisi === 0) {
+                uyariPanel.innerHTML = '<p class="text-muted small mb-0 mt-3 text-center">Şu an bitmek üzere olan paket yok.</p>';
+                uyariButonu.classList.remove("yanip-sonen", "bg-danger"); 
+                uyariButonu.classList.add("bg-secondary"); 
+            } else {
+                uyariButonu.classList.remove("bg-secondary");
+                uyariButonu.classList.add("yanip-sonen", "bg-danger"); 
+            }
+
+            // Giderleri Hafızadan Çek
+            let giderler = JSON.parse(localStorage.getItem('cimnastikGiderler')) || [];
+            let toplamGiderKasa = 0;
+            giderler.forEach(g => toplamGiderKasa += g.tutar);
+
+            // Ekrana Yazdır (Göz Korumalı)
+            document.getElementById('toplamOgrenci').innerText = aktifOgrenciSayisi;
+            kasayaYaz('toplamTahsilat', toplamKasa);
+            kasayaYaz('toplamGider', toplamGiderKasa); 
+            kasayaYaz('netKar', (toplamKasa - toplamGiderKasa));
+        }
+
+        // YENİ: SİL BUTONUNUN ÇALIŞMASI İÇİN GEREKEN ARŞİVLEME MOTORU
+        async function anaSayfadanArsivle(id, ad) {
+            let onay = confirm(`"${ad}" adlı öğrenciyi bu listeden kaldırmak (arşive göndermek) istiyor musunuz?`);
+            if (onay) {
+                try {
+                    let response = await fetch('https://okanjimnastik.pythonanywhere.com/ogrenci_arsivle/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' }
+});
+                    if(response.ok) {
+                        verileriCek(); // Silince sayfa güncellenir ve öğrenci kaybolur
+                    } else {
+                        alert("Arşivleme başarısız!");
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+        }
+        // --- ŞIK BİLDİRİM EFEKTİ ---
+        function bildirimGoster(mesaj) {
+            let kutu = document.getElementById('ozelBildirim');
+            let metin = document.getElementById('bildirimMetni');
+            let cubuk = document.getElementById('bildirimCubugu');
+
+            metin.innerText = mesaj;
+            kutu.classList.add('goster'); // Kutuyu ekrana kaydır
+            
+            // Animasyonu sıfırlayıp baştan başlatma hilesi
+            cubuk.classList.remove('animasyon');
+            void cubuk.offsetWidth; 
+            cubuk.classList.add('animasyon');
+
+            // 2.5 saniye sonra kutuyu sağa doğru geri sakla
+            setTimeout(() => {
+                kutu.classList.remove('goster');
+            }, 2500); 
+        }
+        // --- GİZLEME / GÖSTERME (YILDIZLAMA) FONKSİYONLARI ---
+        function degerGizleGoster(id, btnElement) {
+            let el = document.getElementById(id);
+            let suAnGizliMi = el.getAttribute('data-gizli') === 'true';
+
+            if (suAnGizliMi) {
+                el.innerText = el.getAttribute('data-deger'); // Gerçek sayıyı göster
+                el.setAttribute('data-gizli', 'false');
+                btnElement.innerHTML = '<i class="bi bi-eye"></i>';
+            } else {
+                el.setAttribute('data-deger', el.innerText); // Sayıyı hafızaya al
+                el.innerText = "****"; // Ekrana yıldız bas
+                el.setAttribute('data-gizli', 'true');
+                btnElement.innerHTML = '<i class="bi bi-eye-slash"></i>';
+            }
+        }
+
+        let genelGizli = false;
+        function hepsiniGizleGoster() {
+            genelGizli = !genelGizli;
+            let elemanlar = ['toplamTahsilat', 'toplamGider', 'netKar'];
+            let butonlar = document.querySelectorAll('.gizle-buton');
+            let genelBtn = document.getElementById('btnGenelGizle');
+
+            elemanlar.forEach((id, index) => {
+                let el = document.getElementById(id);
+                if (genelGizli) {
+                    if(el.getAttribute('data-gizli') !== 'true') el.setAttribute('data-deger', el.innerText);
+                    el.innerText = "****";
+                    el.setAttribute('data-gizli', 'true');
+                    if(butonlar[index]) butonlar[index].innerHTML = '<i class="bi bi-eye-slash"></i>';
+                } else {
+                    el.innerText = el.getAttribute('data-deger') || "0 ₺";
+                    el.setAttribute('data-gizli', 'false');
+                    if(butonlar[index]) butonlar[index].innerHTML = '<i class="bi bi-eye"></i>';
+                }
+            });
+            
+            genelBtn.innerHTML = genelGizli ? '<i class="bi bi-eye"></i>  ' : '<i class="bi bi-eye-slash"></i>  ';
+        }
+
+        // ÖNEMLİ: Kasa güncellenirken ekrandaki yıldızların bozulmasını engeller
+        function kasayaYaz(id, miktar) {
+            let el = document.getElementById(id);
+            let metin = miktar + " ₺";
+            el.setAttribute('data-deger', metin); // Sayıyı arka planda hep sakla
+            if (el.getAttribute('data-gizli') !== 'true') {
+                el.innerText = metin; // Sadece kilit açıksa ekrana yaz
+            }
+        }
+        // YENİ: ANA SAYFADAN HIZLI PAKET YENİLEME
+        function hizliPaketYenile(ad, grup, paket) {
+            // 1. Kutuları öğrencinin bilgileriyle doldur
+            document.getElementById('adSoyad').value = ad;
+            document.getElementById('grup').value = grup;
+            document.getElementById('paket').value = paket;
+            
+            // 2. Diğer kutuları temizle (Yeni paket olduğu için ödemeler sıfırlanmalı)
+            document.getElementById('alinanOdeme').value = '';
+            document.getElementById('kalanOdeme').value = '';
+            
+            // 3. Sistemi "Yeni Kayıt" moduna al (Eğer yanlışlıkla "Güncelle" modunda kaldıysa sıfırlar)
+            if (typeof duzenlenenOgrenciId !== 'undefined') {
+                duzenlenenOgrenciId = null; 
+                let btn = document.querySelector('#kayitFormu button[type="submit"]');
+                if(btn) {
+                    btn.innerText = "Sisteme Kaydet";
+                    btn.classList.replace('btn-warning', 'btn-primary');
+                }
+            }
+
+            // 4. Ekranı usulca yukarı (forma doğru) kaydır ve isme odaklan
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('adSoyad').focus();
+
+            // 5. Bilgi ver
+            if(typeof bildirimGoster === "function") {
+                bildirimGoster("🔄 " + ad + " form ekranına aktarıldı.");
+            }
+        }
+        // YENİ: ANA SAYFADAN ÖĞRENCİYİ ARŞİVE GÖNDERME MOTORU
+        async function anaSayfadanArsivle(id, ad) {
+            // 1. Önce kullanıcıya emin misin diye sor
+            let onay = confirm(`"${ad}" adlı öğrenciyi bu listeden kaldırmak (arşive göndermek) istiyor musunuz? \n\nNot: Bu işlem öğrenciyi kalıcı silmez, sadece Aktif Öğrenciler listesinden düşürür.`);
+            
+            if (onay) {
+                try {
+                    // 2. Python'daki "Arşivle" (Pasif yap) kapısını çal
+                    let response = await fetch('https://okanjimnastik.pythonanywhere.com/ogrenci_arsivle/' + id, {
+                        method: 'PUT' // Arşivleme işlemi PUT metoduyla çalışır
+                    });
+
+                    if(response.ok) {
+                        // 3. Başarılı olursa listeyi yenile ki öğrenci ekrandan kaybolsun
+                        verileriCek(); 
+                        if(typeof bildirimGoster === "function") {
+                            bildirimGoster("📦 " + ad + " başarıyla arşive taşındı.");
+                        }
+                    } else {
+                        alert("Arşivleme işlemi başarısız oldu!");
+                    }
+                } catch(e) {
+                    console.error("Sunucu Hatası:", e);
+                    alert("Sunucuya ulaşılamadı. Python çalışıyor mu?");
+                }
+            }
+        }
+        // YENİ: ŞİFRE GÜNCELLEME MOTORU
+        async function sifreGuncelle() {
+            let eski = document.getElementById('eskiSifre').value;
+            let yeni = document.getElementById('yeniSifre').value;
+            let tekrar = document.getElementById('yeniSifreTekrar').value;
+
+            if(!eski || !yeni || !tekrar) {
+                alert("Lütfen tüm alanları doldurun!");
+                return;
+            }
+            if(yeni !== tekrar) {
+                alert("❌ Yeni şifreler birbiriyle uyuşmuyor!");
+                return;
+            }
+
+            try {
+                let response = await fetch('https://okanjimnastik.pythonanywhere.com/sifre_degistir', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eski_sifre: eski, yeni_sifre: yeni })
+                });
+                
+                let sonuc = await response.json();
+                
+                if(sonuc.durum) {
+                    // İşlem başarılıysa bildirim ver ve kutuyu kapat
+                    if(typeof bildirimGoster === "function") bildirimGoster("✅ " + sonuc.mesaj);
+                    
+                    document.getElementById('eskiSifre').value = "";
+                    document.getElementById('yeniSifre').value = "";
+                    document.getElementById('yeniSifreTekrar').value = "";
+                    
+                    let myModalEl = document.getElementById('sifreModal');
+                    let modal = bootstrap.Modal.getInstance(myModalEl);
+                    modal.hide();
+                } else {
+                    alert("❌ " + sonuc.mesaj); // Eski şifre yanlışsa uyarı ver
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Sunucuya bağlanılamadı!");
+            }
+        }
+        // YENİ: SİSTEMDEN ÇIKIŞ YAPMA MOTORU
+        function cikisYap() {
+            let onay = confirm("Sistemden güvenli bir şekilde çıkış yapmak istiyor musunuz?");
+            if (onay) {
+                // Tarayıcıdaki giriş iznini sil
+                localStorage.removeItem('girisIzinBelgesi'); 
+                // Login sayfasına yönlendir
+                window.location.href = 'login.html'; 
+            }
+        }
+    </script>
+    <div class="modal fade" id="sifreModal" tabindex="-1" aria-labelledby="sifreModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content border-primary border-top border-4">
+          <div class="modal-header bg-light">
+            <h5 class="modal-title fw-bold text-primary" id="sifreModalLabel">⚙️ Şifre Değiştir</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Mevcut Şifreniz</label>
+                <input type="password" class="form-control" id="eskiSifre" placeholder="Şu anki şifreniz...">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Yeni Şifre</label>
+                <input type="password" class="form-control" id="yeniSifre" placeholder="Yeni şifreniz...">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Yeni Şifre (Tekrar)</label>
+                <input type="password" class="form-control" id="yeniSifreTekrar" placeholder="Yeni şifrenizi tekrar girin...">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">İptal</button>
+            <button type="button" class="btn btn-primary fw-bold" onclick="sifreGuncelle()">Şifreyi Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>
