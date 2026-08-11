@@ -12,6 +12,7 @@ cloudinary.config(
 )
 
 app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///novart_yeni.db'
