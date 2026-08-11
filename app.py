@@ -14,7 +14,7 @@ cloudinary.config(
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cimnastik.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///novart_yeni.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
