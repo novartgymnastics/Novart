@@ -58,6 +58,43 @@
             </div>
         </div>
     </div>
+    <!-- İÇERİK EKLEME KARTI (KAMPANYA, DUYURU, GALERİ) -->
+<div class="card mt-4 shadow-sm border-0">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fa-solid fa-bullhorn me-2"></i>Yeni İçerik Ekle (Duyuru, Kampanya, Yazı)</h5>
+    </div>
+    <div class="card-body">
+        <form action="/icerik_ekle" method="POST" enctype="multipart/form-data">
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">Ne Ekliyorsunuz?</label>
+                <select class="form-select" name="tip" required>
+                    <option value="kampanya">Kampanya / İndirim Fırsatı</option>
+                    <option value="duyuru">Duyuru / Haber</option>
+                    <option value="galeri">Sadece Fotoğraf (Galeri İçin)</option>
+                    <option value="hakkimizda">Hakkımızda / Genel Yazı</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Başlık</label>
+                <input type="text" class="form-control" name="baslik" placeholder="Örn: Yaz Okulu Kayıtları Başladı!" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Açıklama / Metin</label>
+                <textarea class="form-control" name="aciklama" rows="4" placeholder="İçeriğin detaylarını buraya yazın... (Galeri için boş bırakabilirsiniz)"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Fotoğraf Yükle (İsteğe Bağlı)</label>
+                <input type="file" class="form-control" name="resim">
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 fw-bold">İçeriği Kaydet ve Yayınla</button>
+        </form>
+    </div>
+</div>
 <script>
     document.getElementById('bransEkleForm').addEventListener('submit', async function(e) {
         e.preventDefault(); // Sayfanın yenilenmesini engelle
