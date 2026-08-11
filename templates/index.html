@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -185,6 +184,9 @@
 
     <!-- Menü (Navbar) -->
     <nav class="navbar navbar-expand-lg sticky-top">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="/static/logo.png" alt="Logo"> <!-- Dosyadan çekeceğin için yolunu böyle yazdık -->
+            </a>
        <div class="collapse navbar-collapse" id="anaMenu">
                 
                 <!-- Menü (Sadece buna sol boşluk veriyoruz, buton bundan etkilenmeyecek) -->
@@ -248,71 +250,52 @@
             </div>
         </div>
     </section>
-
-    <!-- Branşlar (Kartlar) Bölümü -->
-    <!-- Branşlar (Kartlar) Bölümü -->
-    <!-- Branşlar (Kartlar) Bölümü -->
-    <section id="branslar" class="brans-section">
-        <div class="container">
-            <!-- Başlığı ortaladık -->
-            <h2 class="section-title text-center">Branşlarımız</h2>
-            
-            <!-- Satırı ve içeriğini ortaladık -->
-            <div class="row g-4 justify-content-center text-center">
-                
-                <!-- 1. Jimnastik -->
-                <div class="col-6 col-lg-3">
-                    <div class="brans-card">
-                        <div class="brans-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Cimnastik">
+<!-- DİNAMİK KAMPANYALAR VE DUYURULAR BÖLÜMÜ -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            {% for item in icerikler %}
+                {% if item.aktif_mi %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100 border-0">
+                        {% if item.resim_url %}
+                        <img src="{{ item.resim_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="...">
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="badge bg-info text-dark mb-2 text-uppercase">{{ item.tip }}</span>
+                            <h4 class="card-title fw-bold">{{ item.baslik }}</h4>
+                            <p class="card-text text-muted">{{ item.aciklama }}</p>
                         </div>
-                        <div class="brans-title">Cimnastik</div>
                     </div>
                 </div>
-
-                <!-- 2. Tekvando -->
-                <div class="col-6 col-lg-3">
-                    <div class="brans-card">
-                        <div class="brans-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Tekvando">
-                        </div>
-                        <div class="brans-title">Tekvando</div>
-                    </div>
-                </div>
-
-                <!-- 3. Mobility -->
-                <div class="col-6 col-lg-3">
-                    <div class="brans-card">
-                        <div class="brans-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Mobility">
-                        </div>
-                        <div class="brans-title">Mobility</div>
-                    </div>
-                </div>
-
-                <!-- 4. Step Aerobik -->
-                <div class="col-6 col-lg-3">
-                    <div class="brans-card">
-                        <div class="brans-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Step Aerobik">
-                        </div>
-                        <div class="brans-title">Step Aerobik</div>
-                    </div>
-                </div>
-
-                <!-- 5. Pilates -->
-                <div class="col-6 col-lg-3">
-                    <div class="brans-card">
-                        <div class="brans-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Pilates">
-                        </div>
-                        <div class="brans-title">Pilates</div>
-                    </div>
-                </div>
-
-            </div>
+                {% endif %}
+            {% endfor %}
         </div>
-    </section>
+    </div>
+</section>
+    <!-- Branşlar (Kartlar) Bölümü -->
+    <!-- Branşlar (Kartlar) Bölümü -->
+    <!-- Branşlar (Kartlar) Bölümü -->
+    <!-- DİNAMİK BRANŞLAR BÖLÜMÜ -->
+<section id="branslar" class="brans-section">
+    <div class="container">
+        <h2 class="section-title text-center">Branşlarımız</h2>
+        
+        <div class="row g-4 justify-content-center text-center">
+            {% for brans in branslar %}
+            <div class="col-6 col-lg-3">
+                <div class="brans-card">
+                    <div class="brans-img-wrapper">
+                        <img src="{{ brans.resim_url }}" alt="{{ brans.isim }}">
+                    </div>
+                    <div class="brans-title">{{ brans.isim }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+    </div>
+</section>
 
     <!-- Footer -->
     <footer class="footer">
