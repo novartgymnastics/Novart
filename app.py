@@ -71,11 +71,12 @@ class SiteIcerik(db.Model):
     aciklama = db.Column(db.Text, nullable=True)
     resim_url = db.Column(db.String(300), nullable=True)
     aktif_mi = db.Column(db.Boolean, default=True)
-# VERİTABANI ZORUNLU KURULUM ADRESİ
+    # VERİTABANI ZORUNLU KURULUM ADRESİ
 @app.route('/kurulum')
 def kurulum_yap():
     db.create_all()
     return "Harika! Tüm veritabanı tabloları (site_icerik dahil) başarıyla oluşturuldu. Şimdi ana sayfaya dönebilirsiniz."
+
 # ANA SAYFA ROTASI (Tüm içerikleri ve branşları ön yüze gönderir)
 @app.route('/')
 def ana_sayfa():
@@ -118,12 +119,18 @@ def site_yonetimi():
     return render_template('site_yonetimi.html')
 
 # --- MEVCUT YÖNETİM (ARKA PLAN) YÖNLENDİRMELERİ ---
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    # 1. Aşama: Kullanıcı butona tıklayıp sayfayı görüntülemek isterse (GET)
+    if request.method == 'GET':
+        return render_template('login.html')
+        
+    # 2. Aşama: Kullanıcı şifre girip giriş yap butonuna basarsa (POST)
     veri = request.json
     if veri['kadi'] == 'tolgahan' and veri['sifre'] == 'kaya3827':
         return jsonify({"mesaj": "Geliştirici Girişi Başarılı", "durum": True})
 
+    # Veritabanındaki diğer kullanıcıları kontrol et
     kullanici = Kullanici.query.filter_by(kullanici_adi=veri['kadi'], sifre=veri['sifre']).first()
     if kullanici:
         return jsonify({"mesaj": "Giriş Başarılı", "durum": True})
