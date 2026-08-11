@@ -73,6 +73,13 @@ class SiteIcerik(db.Model):
     aktif_mi = db.Column(db.Boolean, default=True)
     # VERİTABANI ZORUNLU KURULUM ADRESİ
 @app.route('/kurulum')
+# SİTEYE HER GİRİLDİĞİNDE VERİTABANINI KONTROL EDEN OTOMATİK KORUMA
+@app.before_request
+def veritabani_garanti_altina_al():
+    try:
+        db.create_all()
+    except:
+        pass
 def kurulum_yap():
     db.create_all()
     return "Harika! Tüm veritabanı tabloları (site_icerik dahil) başarıyla oluşturuldu. Şimdi ana sayfaya dönebilirsiniz."
