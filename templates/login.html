@@ -48,36 +48,37 @@
 
     <script>
         document.getElementById('girisFormu').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Sayfa yenilenmesini durdur
+    e.preventDefault(); // Sayfa yenilenmesini durdur
 
-            let kadi = document.getElementById('kadi').value;
-            let sifre = document.getElementById('sifre').value;
-            let hataKutusu = document.getElementById('hataMesaji');
+    let kadi = document.getElementById('kadi').value;
+    let sifre = document.getElementById('sifre').value;
+    let hataKutusu = document.getElementById('hataMesaji');
 
-            try {
-                // YAZDIĞIMIZ PYTHON SUNUCUSUNA (BACKEND) BİLGİ GÖNDERİYORUZ
-                let tepki = await fetch('https://okanjimnastik.pythonanywhere.com/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ kadi: kadi, sifre: sifre })
-                });
-
-                let sonuc = await tepki.json(); // Python'dan gelen cevabı al
-
-                if (sonuc.durum === true) {
-                    // Şifre doğruysa ufak bir giriş anahtarı oluştur ve ana sayfaya yönlendir
-                    localStorage.setItem('girisIzinBelgesi', 'onaylandi');
-                    window.location.href = 'index.html';
-                } else {
-                    // Şifre yanlışsa uyarı ver
-                    hataKutusu.innerText = sonuc.mesaj;
-                    hataKutusu.classList.remove('d-none');
-                }
-            } catch (hata) {
-                hataKutusu.innerText = "Sunucuya bağlanılamadı! (app.py açık mı?)";
-                hataKutusu.classList.remove('d-none');
-            }
+    try {
+        // YAZDIĞIMIZ PYTHON SUNUCUSUNA (BACKEND) BİLGİ GÖNDERİYORUZ
+        // Adresi sadece '/login' yaptık, böylece otomatik olarak Render'daki kendi sunucunu bulacak
+        let tepki = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kadi: kadi, sifre: sifre })
         });
+
+        let sonuc = await tepki.json(); // Python'dan gelen cevabı al
+
+        if (sonuc.durum === true) {
+            // Şifre doğruysa ufak bir giriş anahtarı oluştur ve YÖNETİM PANELİNE yönlendir
+            localStorage.setItem('girisIzinBelgesi', 'onaylandi');
+            window.location.href = '/site_yonetimi'; 
+        } else {
+            // Şifre yanlışsa uyarı ver
+            hataKutusu.innerText = sonuc.mesaj;
+            hataKutusu.classList.remove('d-none');
+        }
+    } catch (hata) {
+        hataKutusu.innerText = "Sunucuya bağlanılamadı! (Bağlantı hatası)";
+        hataKutusu.classList.remove('d-none');
+    }
+});
     </script>
 </body>
 </html>
