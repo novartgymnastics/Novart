@@ -123,7 +123,7 @@ def icerik_ekle():
 # --- ARKADAŞININ GİRECEĞİ YÖNETİM PANELİ ---
 @app.route('/site_yonetimi')
 def site_yonetimi():
-    return render_template('site_yonetimi.html')
+    return render_template('site.yonetimi.html')
 
 # --- MEVCUT YÖNETİM (ARKA PLAN) YÖNLENDİRMELERİ ---
 @app.route('/login', methods=['GET', 'POST'])
