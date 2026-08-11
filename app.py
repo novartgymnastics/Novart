@@ -121,13 +121,13 @@ def icerik_ekle():
     db.session.commit()
 
     # İşlem bitince aynı sayfaya geri dön
-    return redirect('/site_yonetimi')
+    return redirect('/site.yonetimi')
 
 # --- ARKADAŞININ GİRECEĞİ YÖNETİM PANELİ ---
-@app.route('/site_yonetimi')
+@app.route('/site.yonetimi')
 def site_yonetimi():
     return render_template('site.yonetimi.html')
-
+  
 # --- MEVCUT YÖNETİM (ARKA PLAN) YÖNLENDİRMELERİ ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
