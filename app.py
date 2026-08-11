@@ -88,7 +88,7 @@ def kurulum_yap():
 @app.route('/')
 def ana_sayfa():
     branslar = Brans.query.filter_by(aktif_mi=True).all()
-    tum_icerikler = SiteIcerik.query.filter_by(aktif_mi=True).all()
+    tum_icerikler = SiteIcerik.query.all()
     return render_template('index.html', branslar=branslar, icerikler=tum_icerikler)
 # --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
 # --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
