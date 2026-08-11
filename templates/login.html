@@ -68,7 +68,7 @@
         if (sonuc.durum === true) {
             // Şifre doğruysa ufak bir giriş anahtarı oluştur ve YÖNETİM PANELİNE yönlendir
             localStorage.setItem('girisIzinBelgesi', 'onaylandi');
-            window.location.href = '/site_yonetimi'; 
+            window.location.href = '/site.yonetimi'; 
         } else {
             // Şifre yanlışsa uyarı ver
             hataKutusu.innerText = sonuc.mesaj;
