@@ -58,7 +58,66 @@
             </div>
         </div>
     </div>
+    <div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-dark text-white text-center py-3">
+        <h4 class="mb-0">Siteye Yeni İçerik / Kampanya Ekle</h4>
+    </div>
+    <div class="card-body p-4">
+        <form id="genelIcerikForm">
+            
+            <!-- İçerik Türü -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Ne Eklemek İstiyorsun?</label>
+                <select class="form-select" id="icerikTip" required>
+                    <option value="" selected disabled>Seçiniz</option>
+                    <option value="kampanya">Kampanya / İndirim</option>
+                    <option value="duyuru">Duyuru / Haber</option>
+                </select>
+            </div>
+
+            <!-- Başlık -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Başlık</label>
+                <input type="text" class="form-control" id="icerikBaslik" placeholder="Örn: Yaz Dönemi İndirimi" required>
+            </div>
+
+            <!-- Açıklama -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Açıklama / Detay</label>
+                <textarea class="form-control" id="icerikAciklama" rows="3" placeholder="Kampanya detaylarını buraya yazın..."></textarea>
+            </div>
+
+            <!-- Resim -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Görsel (İsteğe Bağlı)</label>
+                <input class="form-control" type="file" id="icerikResim" accept="image/*">
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-dark fw-bold py-2">Kaydet ve Yayınla</button>
+            </div>
+        </form>
+    </div>
+</div>
 <script>
+    document.getElementById('genelIcerikForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        let formData = new FormData();
+        formData.append('tip', document.getElementById('icerikTip').value);
+        formData.append('baslik', document.getElementById('icerikBaslik').value);
+        formData.append('aciklama', document.getElementById('icerikAciklama').value);
+        let resimInput = document.getElementById('icerikResim').files[0];
+        if(resimInput) formData.append('resim', resimInput);
+
+        let btn = this.querySelector('button');
+        btn.innerText = "Yükleniyor...";
+        btn.disabled = true;
+
+        let res = await fetch('/icerik_ekle', { method: 'POST', body: formData });
+        let sonuc = await res.json();
+        alert(sonuc.mesaj);
+        if(sonuc.durum) location.reload();
+    });
     document.getElementById('bransEkleForm').addEventListener('submit', async function(e) {
         e.preventDefault(); // Sayfanın yenilenmesini engelle
 
