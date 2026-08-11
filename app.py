@@ -17,6 +17,9 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cimnastik.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+with app.app_context():
+    db.drop_all() # Eski eksik tabloları tamamen siler
+    db.create_all() # Yeni SiteIcerik dahil tüm tabloları sıfırdan kurar
 
 
 class Kullanici(db.Model):
