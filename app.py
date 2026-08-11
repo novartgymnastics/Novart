@@ -6,9 +6,9 @@ import cloudinary.uploader
 import cloudinary.api
 # Cloudinary Ayarları
 cloudinary.config( 
-  cloud_name = "SENIN_CLOUD_ADIN", 
-  api_key = "SENIN_API_ANAHTARIN", 
-  api_secret = "SENIN_API_SIFREN" 
+  cloud_name = "l1dnx7bv", 
+  api_key = "853834998336977", 
+  api_secret = "xlFuSqJojIlEG_bmflJlXQH2VSo" 
 )
 
 app = Flask(__name__)
@@ -17,6 +17,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cimnastik.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 class Kullanici(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,13 +60,54 @@ with app.app_context():
         db.session.add(yeni_admin)
         db.session.commit()
 
-# --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
+class SiteIcerik(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tip = db.Column(db.String(50), nullable=False) # 'kampanya', 'duyuru', 'slider' vb.
+    baslik = db.Column(db.String(150), nullable=False)
+    aciklama = db.Column(db.Text, nullable=True)
+    resim_url = db.Column(db.String(300), nullable=True)
+    aktif_mi = db.Column(db.Boolean, default=True)
+
+# ANA SAYFA ROTASI (Tüm içerikleri ve branşları ön yüze gönderir)
 @app.route('/')
 def ana_sayfa():
-    # İleride veritabanından branşları çekip buraya göndereceğiz
-    # Şimdilik sadece tasarımı yüklesin
-    return render_template('index.html')
+    branslar = Brans.query.filter_by(aktif_mi=True).all()
+    tum_icerikler = SiteIcerik.query.filter_by(aktif_mi=True).all()
+    return render_template('index.html', branslar=branslar, icerikler=tum_icerikler)
+# --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
+# --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
 
+@app.route('/icerik_ekle', methods=['POST'])
+def icerik_ekle():
+    try:
+        tip = request.form.get('tip')
+        baslik = request.form.get('baslik')
+        aciklama = request.form.get('aciklama')
+        resim_dosyasi = request.files.get('resim')
+
+        resim_linki = ""
+        if resim_dosyasi:
+            yukleme_sonucu = cloudinary.uploader.upload(resim_dosyasi)
+            resim_linki = yukleme_sonucu.get('secure_url')
+
+        yeni_icerik = SiteIcerik(
+            tip=tip,
+            baslik=baslik,
+            aciklama=aciklama,
+            resim_url=resim_linki,
+            aktif_mi=True
+        )
+        db.session.add(yeni_icerik)
+        db.session.commit()
+
+        return jsonify({"durum": True, "mesaj": "İçerik başarıyla eklendi ve sitede yayınlandı!"})
+    except Exception as e:
+        return jsonify({"durum": False, "mesaj": f"Hata: {str(e)}"})
+
+# --- ARKADAŞININ GİRECEĞİ YÖNETİM PANELİ ---
+@app.route('/site_yonetimi')
+def site_yonetimi():
+    return render_template('site_yonetimi.html')
 
 # --- MEVCUT YÖNETİM (ARKA PLAN) YÖNLENDİRMELERİ ---
 @app.route('/login', methods=['POST'])
@@ -204,3 +246,4 @@ def brans_ekle():
 
     except Exception as e:
         return jsonify({"durum": False, "mesaj": f"Hata oluştu: {str(e)}"})
+    
