@@ -93,32 +93,35 @@ def ana_sayfa():
 # --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
 # --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
 
+# KAMPANYA, DUYURU, YAZI VE FOTOĞRAF EKLEME MOTORU
 @app.route('/icerik_ekle', methods=['POST'])
 def icerik_ekle():
-    try:
-        tip = request.form.get('tip')
-        baslik = request.form.get('baslik')
-        aciklama = request.form.get('aciklama')
-        resim_dosyasi = request.files.get('resim')
+    # Formdan gelen verileri yakala
+    tip = request.form.get('tip')
+    baslik = request.form.get('baslik')
+    aciklama = request.form.get('aciklama')
+    resim = request.files.get('resim')
 
-        resim_linki = ""
-        if resim_dosyasi:
-            yukleme_sonucu = cloudinary.uploader.upload(resim_dosyasi)
-            resim_linki = yukleme_sonucu.get('secure_url')
+    resim_url = ""
+    # Eğer adam fotoğraf seçmişse, Cloudinary'ye yükle ve güvenli linkini al
+    if resim and resim.filename != '':
+        yukleme = cloudinary.uploader.upload(resim)
+        resim_url = yukleme['secure_url']
 
-        yeni_icerik = SiteIcerik(
-            tip=tip,
-            baslik=baslik,
-            aciklama=aciklama,
-            resim_url=resim_linki,
-            aktif_mi=True
-        )
-        db.session.add(yeni_icerik)
-        db.session.commit()
+    # Veritabanına yeni içerik olarak kaydet
+    yeni_icerik = SiteIcerik(
+        tip=tip,
+        baslik=baslik,
+        aciklama=aciklama,
+        resim_url=resim_url,
+        aktif_mi=True
+    )
+    
+    db.session.add(yeni_icerik)
+    db.session.commit()
 
-        return jsonify({"durum": True, "mesaj": "İçerik başarıyla eklendi ve sitede yayınlandı!"})
-    except Exception as e:
-        return jsonify({"durum": False, "mesaj": f"Hata: {str(e)}"})
+    # İşlem bitince aynı sayfaya geri dön
+    return redirect('/site_yonetimi')
 
 # --- ARKADAŞININ GİRECEĞİ YÖNETİM PANELİ ---
 @app.route('/site_yonetimi')
