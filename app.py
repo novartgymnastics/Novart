@@ -17,11 +17,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cimnastik.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Veritabanı tablolarını kesin olarak oluşturan kod
+
 with app.app_context():
-    db.drop_all() # Eski eksik tabloları tamamen siler
-    db.create_all() # Yeni SiteIcerik dahil tüm tabloları sıfırdan kurar
-
-
+    db.create_all()
 class Kullanici(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     kullanici_adi = db.Column(db.String(50), unique=True, nullable=False)
@@ -55,6 +55,7 @@ class Ayarlar(db.Model):
     hero_baslik = db.Column(db.String(200), default="NOVART JİMNASTİK KULÜBÜ")
     hero_alt_yazi = db.Column(db.Text, nullable=True)
     iletisim_telefon = db.Column(db.String(20), nullable=True)
+    
 
 with app.app_context():
     db.create_all()
