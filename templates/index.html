@@ -170,6 +170,51 @@
         .social-icons a:hover {
             color: var(--ana-renk);
         }
+        .branch-cards-section {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+}
+
+.branch-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.branch-card {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 220px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.branch-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.branch-card h3 {
+    padding: 15px 0;
+    margin: 0;
+    font-size: 18px;
+    color: #00acc1; /* Görseldeki mavi tonuna uygun */
+    font-weight: 600;
+}
     </style>
 </head>
 <body>
@@ -289,6 +334,49 @@
             {% endfor %}
         </div>
         
+    </div>
+</section>
+    <section class="branch-cards-section">
+    <div class="branch-container">
+        <!-- Mobility Kartı -->
+        <div class="branch-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80" alt="Mobility">
+            </div>
+            <h3>Mobility</h3>
+        </div>
+
+        <!-- Step Aerobik Kartı -->
+        <div class="branch-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=600&q=80" alt="Step Aerobik">
+            </div>
+            <h3>Step Aerobik</h3>
+        </div>
+
+        <!-- Pilates Kartı -->
+        <div class="branch-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80" alt="Pilates">
+            </div>
+            <h3>Pilates</h3>
+        </div>
+
+        <!-- Gymnastic Kartı -->
+        <div class="branch-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1566241142559-40e1dab266c6?auto=format&fit=crop&w=600&q=80" alt="Gymnastic">
+            </div>
+            <h3>Gymnastic</h3>
+        </div>
+
+        <!-- Taekwondo Kartı -->
+        <div class="branch-card">
+            <div class="card-image">
+                <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=600&q=80" alt="Taekwondo">
+            </div>
+            <h3>Taekwondo</h3>
+        </div>
     </div>
 </section>
 
