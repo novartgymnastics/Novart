@@ -299,12 +299,15 @@ def brans_detay(brans_adi):
     # Gelen ismi düzenleyelim (Örn: step-aerobik -> Step Aerobik)
     temiz_isim = brans_adi.replace('-', ' ').title()
     return render_template('brans_detay.html', brans_adi=temiz_isim)
-  @app.route('/')
+ @app.route('/')
 def index():
-    # Supabase'den branşları çekiyoruz
-    response = supabase.table('branslar').select("*").execute()
-    branslar = response.data  # İşte verilerimiz burada!
-    
-    # index.html dosyasına bu verileri gönderiyoruz
+    try:
+        # Supabase'den veriyi çek
+        response = supabase.table('branslar').select("*").execute()
+        branslar = response.data
+        print("Çekilen branşlar:", branslar) # Terminalde veri gelip gelmediğini kontrol et
+    except Exception as e:
+        print("Hata:", e)
+        branslar = [] # Hata olursa boş liste dönsün
+        
     return render_template('index.html', branslar=branslar)
-    
