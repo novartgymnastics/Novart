@@ -310,4 +310,4 @@ def index():
         print("Hata:", e)
         branslar = [] # Hata olursa boş liste dönsün
         
-    return render_template('index.html', branslar=branslar)
+        return render_template('index.html', branslar=branslar)
