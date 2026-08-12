@@ -278,45 +278,39 @@
         <h2 class="section-title text-center">Branşlarımız</h2>
         
         <div class="row g-4 justify-content-center text-center">
-            {% for brans in branslar %}
-            <div class="col-6 col-lg-3">
-                <!-- Kartın tamamına tıklandığında yeni sekmede detay sayfasına gider -->
-                <a href="/brans/{{ brans.isim }}" target="_blank" class="text-decoration-none">
-                    <div class="brans-card">
-                        <div class="row g-4 justify-content-center text-center">
     {% for brans in branslar %}
     <div class="col-6 col-lg-3">
-        <!-- Kartın etrafındaki a etiketini (yeni sekmeye gitme) koruyoruz -->
-        <a href="/brans/{{ brans.isim }}" target="_blank" class="text-decoration-none">
-            <div class="brans-card position-relative">
+        <div class="card border-0 shadow-sm position-relative overflow-hidden h-100">
+            
+            <!-- Resim ve Yükleme Butonu Alanı -->
+            <div style="height: 180px; background-color: #f8f9fa; position: relative;">
+                <img src="{{ brans.resim_url }}" id="brans-resim-{{ brans.id }}" alt="{{ brans.isim }}" style="width: 100%; height: 100%; object-fit: cover;">
                 
-                <!-- Resim ve Yükleme Butonu Alanı -->
-                <div class="brans-img-wrapper position-relative">
-                    <img src="{{ brans.resim_url }}" id="brans-resim-{{ brans.id }}" alt="{{ brans.isim }}" class="img-fluid" style="min-height: 150px; background-color: #f0f0f0;">
-                    
-                    <!-- Resim Seçme İkonu (Sağ Üst Köşede Çıkar) -->
-                    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 shadow-sm" 
-                            onclick="document.getElementById('dosya-sec-{{ brans.id }}').click(); event.preventDefault();">
-                        <i id="yukleme-ikon-{{ brans.id }}" class="fa-solid fa-camera text-secondary"></i>
-                    </button>
-                    
-                    <!-- Gizli Dosya Seçici -->
-                    <input type="file" id="dosya-sec-{{ brans.id }}" class="d-none" accept="image/*" 
-                           onchange="resimYukle({{ brans.id }}, this)">
-                </div>
-
-                <div class="brans-title text-dark fw-bold mt-2">{{ brans.isim }}</div>
+                <!-- Resim Seçme Butonu (Sağ Üst Köşe) -->
+                <button type="button" class="btn btn-light btn-sm shadow-sm position-absolute top-0 end-0 m-2 rounded-circle" 
+                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; z-index: 10;"
+                        onclick="document.getElementById('dosya-sec-{{ brans.id }}').click();" 
+                        title="Resmi Değiştir">
+                    <i id="yukleme-ikon-{{ brans.id }}" class="fa-solid fa-camera text-dark" style="font-size: 0.9rem;"></i>
+                </button>
+                
+                <!-- Gizli Dosya Seçici -->
+                <input type="file" id="dosya-sec-{{ brans.id }}" class="d-none" accept="image/*" 
+                       onchange="resimYukle({{ brans.id }}, this)">
             </div>
-        </a>
+
+            <!-- Kart Yazısı ve Detay Sayfasına Gitme Butonu -->
+            <div class="card-body bg-white text-center p-3">
+                <h5 class="card-title fw-bold text-dark mb-2">{{ brans.isim }}</h5>
+                <a href="/brans/{{ brans.isim }}" target="_blank" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                    Detayları Gör <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+        </div>
     </div>
     {% endfor %}
 </div>
-                        <div class="brans-title text-dark fw-bold mt-2">{{ brans.isim }}</div>
-                    </div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
         
     </div>
 </section>
