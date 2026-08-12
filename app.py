@@ -92,13 +92,7 @@ def kurulum_yap():
     return "Harika! Tüm veritabanı tabloları (site_icerik dahil) başarıyla oluşturuldu. Şimdi ana sayfaya dönebilirsiniz."
 
 # ANA SAYFA ROTASI (Tüm içerikleri ve branşları ön yüze gönderir)
-@app.route('/')
-def ana_sayfa():
-    branslar = Brans.query.filter_by(aktif_mi=True).all()
-    tum_icerikler = SiteIcerik.query.all()
-    return render_template('index.html', branslar=branslar, icerikler=tum_icerikler)
-# --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
-# --- VİTRİN (ÖN YÜZ) YÖNLENDİRMELERİ ---
+
 
 # KAMPANYA, DUYURU, YAZI VE FOTOĞRAF EKLEME MOTORU
 @app.route('/icerik_ekle', methods=['POST'])
@@ -302,12 +296,17 @@ def brans_detay(brans_adi):
 @app.route('/')
 def index():
     try:
-        # Supabase'den veriyi çek
-        response = supabase.table('branslar').select("*").execute()
-        branslar = response.data
-        print("Çekilen branşlar:", branslar) # Terminalde veri gelip gelmediğini kontrol et
-    except Exception as e:
-        print("Hata:", e)
-        branslar = [] # Hata olursa boş liste dönsün
+        # Supabase'den branşları çekiyoruz
+        brans_response = supabase.table('branslar').select("*").execute()
+        branslar = brans_response.data
         
-        return render_template('index.html', branslar=branslar)
+        # Supabase'den içerikleri (duyurular vs.) çekiyoruz
+        icerik_response = supabase.table('icerikler').select("*").execute()
+        tum_icerikler = icerik_response.data
+        
+    except Exception as e:
+        print("Supabase Veri Çekme Hatası:", e)
+        branslar = []
+        tum_icerikler = []
+        
+    return render_template('index.html', branslar=branslar, icerikler=tum_icerikler)
