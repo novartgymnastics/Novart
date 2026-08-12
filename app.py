@@ -4,6 +4,12 @@ from flask_cors import CORS
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+
+from supabase import create_client, Client
+
+url = "SUP_URL_BURAYA"
+key = "SUP_ANON_KEY_BURAYA"
+supabase: Client = create_client(url, key)
 # Cloudinary Ayarları
 cloudinary.config( 
   cloud_name = "l1dnx7bv", 
