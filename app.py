@@ -287,4 +287,10 @@ def brans_ekle():
 
     except Exception as e:
         return jsonify({"durum": False, "mesaj": f"Hata oluştu: {str(e)}"})
+
+@app.route('/brans/<brans_adi>')
+def brans_detay(brans_adi):
+    # Gelen ismi düzenleyelim (Örn: step-aerobik -> Step Aerobik)
+    temiz_isim = brans_adi.replace('-', ' ').title()
+    return render_template('brans_detay.html', brans_adi=temiz_isim)
     
