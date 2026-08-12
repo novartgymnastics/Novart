@@ -323,12 +323,19 @@ def hizli_guncelle():
     data = request.get_json()
     kayit_id = data.get('id')
     yeni_metin = data.get('yeni_metin')
-    tablo = data.get('tablo') # 'branslar' veya 'icerikler' olabilir
-    kolon = data.get('kolon') # 'baslik', 'isim' veya 'aciklama' olabilir
+    tablo = data.get('tablo')
+    kolon = data.get('kolon')
 
     try:
-        # Supabase'deki ilgili tabloyu ve id'yi bulup güncelliyoruz
-        supabase.table(tablo).update({kolon: yeni_metin}).eq("id", kayit_id).execute()
+        # Supabase ID'yi sayı olarak bekler, veriyi tam sayıya (int) çeviriyoruz
+        kayit_id = int(kayit_id) 
+        
+        response = supabase.table(tablo).update({kolon: yeni_metin}).eq("id", kayit_id).execute()
+        
+        # Eğer güncellenen veri boş dönerse (RLS engeli varsa veya ID bulunamadıysa)
+        if len(response.data) == 0:
+            return jsonify({"durum": "hata", "mesaj": "Güvenlik engeli (RLS) nedeniyle Supabase'e kaydedilemedi."})
+            
         return jsonify({"durum": "basarili"})
     except Exception as e:
         return jsonify({"durum": "hata", "mesaj": str(e)})
