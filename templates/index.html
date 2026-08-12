@@ -283,9 +283,34 @@
                 <!-- Kartın tamamına tıklandığında yeni sekmede detay sayfasına gider -->
                 <a href="/brans/{{ brans.isim }}" target="_blank" class="text-decoration-none">
                     <div class="brans-card">
-                        <div class="brans-img-wrapper">
-                            <img src="{{ brans.resim_url }}" alt="{{ brans.isim }}" class="img-fluid">
-                        </div>
+                        <div class="row g-4 justify-content-center text-center">
+    {% for brans in branslar %}
+    <div class="col-6 col-lg-3">
+        <!-- Kartın etrafındaki a etiketini (yeni sekmeye gitme) koruyoruz -->
+        <a href="/brans/{{ brans.isim }}" target="_blank" class="text-decoration-none">
+            <div class="brans-card position-relative">
+                
+                <!-- Resim ve Yükleme Butonu Alanı -->
+                <div class="brans-img-wrapper position-relative">
+                    <img src="{{ brans.resim_url }}" id="brans-resim-{{ brans.id }}" alt="{{ brans.isim }}" class="img-fluid" style="min-height: 150px; background-color: #f0f0f0;">
+                    
+                    <!-- Resim Seçme İkonu (Sağ Üst Köşede Çıkar) -->
+                    <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 shadow-sm" 
+                            onclick="document.getElementById('dosya-sec-{{ brans.id }}').click(); event.preventDefault();">
+                        <i id="yukleme-ikon-{{ brans.id }}" class="fa-solid fa-camera text-secondary"></i>
+                    </button>
+                    
+                    <!-- Gizli Dosya Seçici -->
+                    <input type="file" id="dosya-sec-{{ brans.id }}" class="d-none" accept="image/*" 
+                           onchange="resimYukle({{ brans.id }}, this)">
+                </div>
+
+                <div class="brans-title text-dark fw-bold mt-2">{{ brans.isim }}</div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
                         <div class="brans-title text-dark fw-bold mt-2">{{ brans.isim }}</div>
                     </div>
                 </a>
@@ -336,5 +361,41 @@
 
     <!-- Bootstrap Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function resimYukle(bransId, inputElement) {
+        const dosya = inputElement.files[0];
+        if (!dosya) return; // Dosya seçilmeden iptale basılırsa hiçbir şey yapma
+
+        // Yükleniyor efekti verelim (Kamera ikonu dönen yıldıza dönüşsün)
+        const ikon = document.getElementById(`yukleme-ikon-${bransId}`);
+        ikon.className = "fa-solid fa-spinner fa-spin text-primary";
+
+        // Dosyayı Python'a göndermek için paketliyoruz
+        const formData = new FormData();
+        formData.append('resim_dosyasi', dosya);
+        formData.append('id', bransId);
+
+        // Python'daki resim_yukle rotamıza gönderiyoruz
+        fetch('/resim_yukle', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.durum === 'basarili') {
+                // Yükleme başarılıysa ekrandaki resmi anında yeni resimle değiştir
+                document.getElementById(`brans-resim-${bransId}`).src = data.yeni_url;
+                ikon.className = "fa-solid fa-camera text-secondary"; // İkonu normale çevir
+            } else {
+                alert("Hata: " + data.mesaj);
+                ikon.className = "fa-solid fa-camera text-secondary";
+            }
+        })
+        .catch(error => {
+            alert("Sistemsel bir hata oluştu.");
+            ikon.className = "fa-solid fa-camera text-secondary";
+        });
+    }
+</script>
 </body>
 </html>
