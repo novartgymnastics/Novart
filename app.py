@@ -299,7 +299,7 @@ def brans_detay(brans_adi):
     # Gelen ismi düzenleyelim (Örn: step-aerobik -> Step Aerobik)
     temiz_isim = brans_adi.replace('-', ' ').title()
     return render_template('brans_detay.html', brans_adi=temiz_isim)
- @app.route('/')
+@app.route('/')
 def index():
     try:
         # Supabase'den veriyi çek
