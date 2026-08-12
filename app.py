@@ -295,8 +295,11 @@ def brans_detay(brans_adi):
     return render_template('brans_detay.html', brans_adi=temiz_isim)
 @app.route('/')
 def index():
-    # Supabase'den branşları çekmeyi deneyelim
-    response = supabase.table('branslar').select("*").execute()
-    print("SUPABASE'DEN GELEN VERİ:", response.data) # Terminale yazdırır
-    
-    return f"Supabase'den gelen ham veri: {response.data}"
+    try:
+        # Supabase'den branşları çekmeyi deneyelim
+        response = supabase.table('branslar').select("*").execute()
+        branslar = response.data
+        return render_template('index.html', branslar=branslar)
+    except Exception as e:
+        # Hata olursa ekrana doğrudan hatanın ne olduğunu yazdırsın!
+        return f"KRİTİK HATA OLUŞTU: {str(e)}"
