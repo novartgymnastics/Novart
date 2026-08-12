@@ -4,6 +4,7 @@ from flask_cors import CORS
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+import time 
 
 from supabase import create_client, Client
 
@@ -339,8 +340,7 @@ def hizli_guncelle():
         return jsonify({"durum": "basarili"})
     except Exception as e:
         return jsonify({"durum": "hata", "mesaj": str(e)})
-      import time # Dosyanın en üstündeki importların yanına eklenebilir, yoksa direkt buraya da koyabilirsin
-
+      
 @app.route('/resim_yukle', methods=['POST'])
 def resim_yukle():
     try:
