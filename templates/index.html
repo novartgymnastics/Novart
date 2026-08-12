@@ -224,21 +224,18 @@
             </div>
     </nav>
 <!-- ALT BİLGİ ŞERİDİ (BRANŞLAR) -->
-    <div class="text-white py-2 shadow-sm" style="background-color: #3ec1d5;" style="border-bottom: 3px solid #3ec1d5;">
-        <div class="container">
-            <div class="d-flex justify-content-center flex-wrap gap-3 gap-md-5 fw-semibold" style="font-size: 0.95rem; letter-spacing: 1px;">
-            <a href="/brans/cimnastik" target="_blank" class="text-white text-decoration-none">Cimnastik</a>
-            <span class="text-white d-none d-md-inline">|</span>
-            <a href="/brans/tekvando" target="_blank" class="text-white text-decoration-none">Tekvando</a>
-            <span class="text-white d-none d-md-inline">|</span>
-            <a href="/brans/mobility" target="_blank" class="text-white text-decoration-none">Mobility</a>
-            <span class="text-white d-none d-md-inline">|</span>
-            <a href="/brans/step-aerobik" target="_blank" class="text-white text-decoration-none">Step Aerobik</a>
-            <span class="text-white d-none d-md-inline">|</span>
-            <a href="/brans/pilates" target="_blank" class="text-white text-decoration-none">Pilates</a>
-            </div>
+    <div class="text-white py-2 shadow-sm" style="background-color: #3ec1d5; border-bottom: 3px solid #2da4b5;">
+    <div class="container">
+        <div class="d-flex justify-content-center flex-wrap gap-3 gap-md-5 fw-semibold" style="font-size: 0.95rem; letter-spacing: 1px;">
+            {% for brans in branslar %}
+            <a href="/brans/{{ brans.isim | lower }}" class="text-white text-decoration-none">
+                {{ brans.isim }}
+            </a>
+            {% if not loop.last %} | {% endif %}
+            {% endfor %}
         </div>
     </div>
+</div>
     <!-- Hero Bölümü (Kapak) -->
     <section class="hero-section">
         <div class="container">
