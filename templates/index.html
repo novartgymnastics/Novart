@@ -182,12 +182,7 @@
     </style>
 </head>
 <body>
-<!-- Resim Seçme Butonu (Sağ Üst Köşe) -->
-<button type="button" class="btn btn-light btn-sm shadow-sm btn-camera-upload rounded-circle" 
-        onclick="document.getElementById('dosya-sec-{{ brans.id }}').click();" 
-        title="Resmi Değiştir">
-    <i id="yukleme-ikon-{{ brans.id }}" class="fa-solid fa-camera text-dark"></i>
-</button>
+
     <!-- Üst Bilgi Çubuğu -->
     <div class="top-bar py-2 d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
@@ -300,12 +295,13 @@
                 <img src="{{ brans.resim_url }}" id="brans-resim-{{ brans.id }}" alt="{{ brans.isim }}" style="width: 100%; height: 100%; object-fit: cover;">
                 
                 <!-- Resim Seçme Butonu (Sağ Üst Köşe) -->
-                <button type="button" class="btn btn-light btn-sm shadow-sm position-absolute top-0 end-0 m-2 rounded-circle" 
-                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; z-index: 10;"
-                        onclick="document.getElementById('dosya-sec-{{ brans.id }}').click();" 
-                        title="Resmi Değiştir">
-                    <i id="yukleme-ikon-{{ brans.id }}" class="fa-solid fa-camera text-dark" style="font-size: 0.9rem;"></i>
-                </button>
+                <!-- Resim Seçme Butonu (Değişiklik yapıldı) -->
+<button type="button" class="btn btn-primary btn-sm position-absolute top-0 end-0 m-2" 
+        style="z-index: 9999 !important; opacity: 1 !important;"
+        onclick="document.getElementById('dosya-sec-{{ brans.id }}').click();" 
+        title="Resmi Değiştir">
+    KAMERA
+</button>
                 
                 <!-- Gizli Dosya Seçici -->
                 <input type="file" id="dosya-sec-{{ brans.id }}" class="d-none" accept="image/*" 
