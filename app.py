@@ -295,18 +295,8 @@ def brans_detay(brans_adi):
     return render_template('brans_detay.html', brans_adi=temiz_isim)
 @app.route('/')
 def index():
-    try:
-        # Supabase'den branşları çekiyoruz
-        brans_response = supabase.table('branslar').select("*").execute()
-        branslar = brans_response.data
-        
-        # Supabase'den içerikleri (duyurular vs.) çekiyoruz
-        icerik_response = supabase.table('icerikler').select("*").execute()
-        tum_icerikler = icerik_response.data
-        
-    except Exception as e:
-        print("Supabase Veri Çekme Hatası:", e)
-        branslar = []
-        tum_icerikler = []
-        
-    return render_template('index.html', branslar=branslar, icerikler=tum_icerikler)
+    # Supabase'den branşları çekmeyi deneyelim
+    response = supabase.table('branslar').select("*").execute()
+    print("SUPABASE'DEN GELEN VERİ:", response.data) # Terminale yazdırır
+    
+    return f"Supabase'den gelen ham veri: {response.data}"
