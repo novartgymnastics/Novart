@@ -7,7 +7,7 @@ import cloudinary.api
 
 from supabase import create_client, Client
 
-url = "https://zbrgxsrbtoeufjrqubmu.supabase.co/rest/v1/"
+url = "https://zbrgxsrbtoeufjrqubmu.supabase.co"
 key = "sb_publishable_CQjOHOLpHulssvydZvYG4w_0qXsL89a"
 supabase: Client = create_client(url, key)
 # Cloudinary Ayarları
