@@ -199,18 +199,16 @@
                         <a class="nav-link dropdown-toggle" href="#" id="branslarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Branşlar
                         </a>
-                        <ul class="dropdown-menu shadow border-0" aria-labelledby="branslarDropdown">
-                            <li><h6 class="dropdown-header text-uppercase fw-bold text-info">Grup Dersleri</h6></li>
-                            <li><a class="dropdown-item" href="#branslar">Jimnastik</a></li>
-                            <li><a class="dropdown-item" href="#branslar">Tekvando</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header text-uppercase fw-bold text-info">Bireysel Dersler</h6></li>
-                            <li><a class="dropdown-item" href="#branslar">Mobility</a></li>
-                            <li><a class="dropdown-item" href="#branslar">Step Aerobik</a></li>
-                            <li><a class="dropdown-item" href="#branslar">Pilates</a></li>
-                            <li><a class="dropdown-item" href="#branslar">Cimnastik</a></li>
-                            <li><a class="dropdown-item" href="#branslar">Tekvando</a></li>
-                        </ul>
+                        <ul class="dropdown-menu shadow border-0">
+        <!-- Supabase'den gelen branşları döngüye sokup yeni sekmede açılmasını sağlıyoruz -->
+        {% for brans in branslar %}
+            <li>
+                <a class="dropdown-item py-2" href="/brans/{{ brans.isim }}" target="_blank">
+                    {{ brans.isim }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
                     </li>
 
                     <li class="nav-item"><a class="nav-link" href="#">İletişim</a></li>
