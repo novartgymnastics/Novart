@@ -303,3 +303,18 @@ def index():
     except Exception as e:
         # Hata olursa ekrana doğrudan hatanın ne olduğunu yazdırsın!
         return f"KRİTİK HATA OLUŞTU: {str(e)}"
+
+@app.route('/hizli_guncelle', methods=['POST'])
+def hizli_guncelle():
+    data = request.get_json()
+    kayit_id = data.get('id')
+    yeni_metin = data.get('yeni_metin')
+    tablo = data.get('tablo') # 'branslar' veya 'icerikler' olabilir
+    kolon = data.get('kolon') # 'baslik', 'isim' veya 'aciklama' olabilir
+
+    try:
+        # Supabase'deki ilgili tabloyu ve id'yi bulup güncelliyoruz
+        supabase.table(tablo).update({kolon: yeni_metin}).eq("id", kayit_id).execute()
+        return jsonify({"durum": "basarili"})
+    except Exception as e:
+        return jsonify({"durum": "hata", "mesaj": str(e)})
