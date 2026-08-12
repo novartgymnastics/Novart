@@ -301,12 +301,10 @@ def brans_detay(brans_adi):
     return render_template('brans_detay.html', brans_adi=temiz_isim)
   @app.route('/')
 def index():
-    # Supabase'den içerikleri ve branşları çekiyoruz
-    icerikler_res = supabase.table('icerikler').select("*").execute()
-    branslar_res = supabase.table('branslar').select("*").execute()
+    # Supabase'den branşları çekiyoruz
+    response = supabase.table('branslar').select("*").execute()
+    branslar = response.data  # İşte verilerimiz burada!
     
-    icerikler = icerikler_res.data
-    branslar = branslar_res.data
-    
-    return render_template('index.html', icerikler=icerikler, branslar=branslar)
+    # index.html dosyasına bu verileri gönderiyoruz
+    return render_template('index.html', branslar=branslar)
     
