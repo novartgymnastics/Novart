@@ -92,6 +92,77 @@
             </div>
         </div>
     </main>
+    <!-- === GENEL DETAYLAR KISMI === -->
+<div class="mb-4">
+    <h5 class="fw-bold text-dark mb-3">
+        👦 👧 Genel Detaylar
+    </h5>
+    
+    <!-- Yaş Aralığı -->
+    <div class="d-flex align-items-center text-muted mb-2">
+        <i class="fa-solid fa-child text-info me-2" style="width: 20px;"></i>
+        <strong class="text-dark me-1">Yaş Aralığı:</strong> 
+        <span id="gosterim-yas_araligi-{{ brans.id }}">{{ brans.yas_araligi }}</span>
+        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
+           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'yas_araligi', '{{ brans.yas_araligi }}')"></i>
+    </div>
+
+    <!-- Doğum Yılı -->
+    <div class="d-flex align-items-center text-muted mb-2">
+        <i class="fa-solid fa-calendar-days text-info me-2" style="width: 20px;"></i>
+        <strong class="text-dark me-1">Doğum Yılı:</strong> 
+        <span id="gosterim-dogum_yili-{{ brans.id }}">{{ brans.dogum_yili }}</span>
+        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
+           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'dogum_yili', '{{ brans.dogum_yili }}')"></i>
+    </div>
+
+    <!-- Cinsiyet -->
+    <div class="d-flex align-items-center text-muted mb-2">
+        <i class="fa-solid fa-venus-mars text-info me-2" style="width: 20px;"></i>
+        <strong class="text-dark me-1">Cinsiyet:</strong> 
+        <span id="gosterim-cinsiyet-{{ brans.id }}">{{ brans.cinsiyet }}</span>
+        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
+           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'cinsiyet', '{{ brans.cinsiyet }}')"></i>
+    </div>
+</div>
+
+<!-- === KURS GÜN VE SAATLERİ KISMI === -->
+<div class="mb-4">
+    <h5 class="fw-bold text-dark mb-3">
+        📅 Kurs Gün ve Saatleri
+    </h5>
+    
+    <!-- Hafta Sonu -->
+    <div class="d-flex align-items-center text-muted mb-2">
+        <i class="fa-solid fa-clock text-info me-2" style="width: 20px;"></i>
+        <strong class="text-dark me-1">Hafta Sonu:</strong> 
+        <span id="gosterim-hafta_sonu_saatleri-{{ brans.id }}">{{ brans.hafta_sonu_saatleri }}</span>
+        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
+           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'hafta_sonu_saatleri', '{{ brans.hafta_sonu_saatleri }}')"></i>
+    </div>
+
+    <!-- Hafta İçi -->
+    <div class="d-flex align-items-center text-muted mb-2">
+        <i class="fa-solid fa-clock text-info me-2" style="width: 20px;"></i>
+        <strong class="text-dark me-1">Hafta İçi:</strong> 
+        <span id="gosterim-hafta_ici_saatleri-{{ brans.id }}">{{ brans.hafta_ici_saatleri }}</span>
+        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
+           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'hafta_ici_saatleri', '{{ brans.hafta_ici_saatleri }}')"></i>
+    </div>
+</div>
+
+<!-- === GEREKLİ MALZEMELER KISMI === -->
+<div class="mb-4">
+    <h5 class="fw-bold text-dark mb-3">
+        🛍️ Gerekli Malzemeler
+    </h5>
+    <div class="d-flex align-items-center text-muted mb-2">
+        <i class="fa-solid fa-shirt text-info me-2" style="width: 20px;"></i>
+        <span id="gosterim-malzemeler-{{ brans.id }}">{{ brans.malzemeler }}</span>
+        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
+           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'malzemeler', '{{ brans.malzemeler }}')"></i>
+    </div>
+</div>
 
 </body>
 </html>
