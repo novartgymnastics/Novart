@@ -128,8 +128,16 @@
             object-fit: cover;
             transition: 0.5s;
         }
-        .brans-card:hover .brans-img-wrapper img {
-            transform: scale(1.1);
+        .brans-img-wrapper {
+            position: relative;
+            padding-bottom: 100%;
+            overflow: visible; /* 'hidden' idi, 'visible' yaptık ki buton dışarı taşmasın */
+        }
+        .btn-camera-upload {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            z-index: 999 !important;
         }
         .brans-title {
             padding: 20px;
@@ -174,7 +182,12 @@
     </style>
 </head>
 <body>
-
+<!-- Resim Seçme Butonu (Sağ Üst Köşe) -->
+<button type="button" class="btn btn-light btn-sm shadow-sm btn-camera-upload rounded-circle" 
+        onclick="document.getElementById('dosya-sec-{{ brans.id }}').click();" 
+        title="Resmi Değiştir">
+    <i id="yukleme-ikon-{{ brans.id }}" class="fa-solid fa-camera text-dark"></i>
+</button>
     <!-- Üst Bilgi Çubuğu -->
     <div class="top-bar py-2 d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
