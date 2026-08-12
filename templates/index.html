@@ -193,44 +193,52 @@
 
     <!-- Menü (Navbar) -->
     <nav class="navbar navbar-expand-lg sticky-top">
-    <a class="navbar-brand d-flex align-items-center ms-3" href="/">
-        <img src="{{ url_for('static', filename='logo.png.png') }}" alt="Logo" style="height: 80px; width: auto;">
-    </a>
-</nav>
-       <div class="collapse navbar-collapse" id="anaMenu">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center ms-3" href="/">
+            <img src="{{ url_for('static', filename='logo.png.png') }}" alt="Logo" style="height: 80px; width: auto;">
+        </a>
+
+        <!-- Mobilde açılıp kapanma butonu -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#anaMenu" aria-controls="anaMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menü ve Buton Alanı -->
+        <div class="collapse navbar-collapse" id="anaMenu">
                 
-                <!-- Menü (Sadece buna sol boşluk veriyoruz, buton bundan etkilenmeyecek) -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 700px;">
-                    <li class="nav-item"><a class="nav-link" href="#">Ana Sayfa</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Kurumsal</a></li>
-                    
-                    <!-- Branşlar Açılır Menü -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="branslarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Branşlar
-                        </a>
-                        <ul class="dropdown-menu shadow border-0">
-        <!-- Supabase'den gelen branşları döngüye sokup yeni sekmede açılmasını sağlıyoruz -->
-        {% for brans in branslar %}
-            <li>
-                <a class="dropdown-item py-2" href="/brans/{{ brans.isim }}" target="_blank">
-                    {{ brans.isim }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-                    </li>
+            <!-- Menü (Sol boşluğu margin yerine ms-auto veya esnek yapı ile yönetmek daha sağlıklıdır ama şimdiki gibi bırakabilirsin) -->
+            <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: auto;">
+                <li class="nav-item"><a class="nav-link" href="/">Ana Sayfa</a></li>
+                <li class="nav-item"><a class="nav-link" href="/kurumsal">Kurumsal</a></li>
+                
+                <!-- Branşlar Açılır Menü -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="branslarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Branşlar
+                    </a>
+                    <ul class="dropdown-menu shadow border-0">
+                        {% for brans in branslar %}
+                            <li>
+                                <a class="dropdown-item py-2" href="/brans/{{ brans.isim }}" target="_blank">
+                                    {{ brans.isim }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
 
-                    <li class="nav-item"><a class="nav-link" href="#">İletişim</a></li>
-                </ul>
+                <li class="nav-item"><a class="nav-link" href="/iletisim">İletişim</a></li>
+            </ul>
 
-                <!-- İŞTE BURASI: Menü ile butonun arasına görünmez bir esneme yayı koyuyoruz -->
-                <div class="ms-auto"></div>
-
-                <!-- Buton (Artık tamamen bağımsız, sağdaki yerinde sabit duracak) -->
-                <a href="#" class="btn btn-basvuru" style="margin-right: 220px;">ÖN KAYIT FORMU <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            <!-- Sağ Taraftaki Ön Kayıt Butonu -->
+            <div class="ms-lg-3 me-lg-4">
+                <a href="#" class="btn btn-basvuru">ÖN KAYIT FORMU <i class="fa-solid fa-arrow-right ms-1"></i></a>
             </div>
-    </nav>
+
+        </div>
+    </div>
+</nav>
 <!-- ALT BİLGİ ŞERİDİ (BRANŞLAR) -->
     <div class="text-white py-2 shadow-sm" style="background-color: #3ec1d5; border-bottom: 3px solid #2da4b5;">
     <div class="container">
