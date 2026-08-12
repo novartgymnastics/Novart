@@ -339,3 +339,36 @@ def hizli_guncelle():
         return jsonify({"durum": "basarili"})
     except Exception as e:
         return jsonify({"durum": "hata", "mesaj": str(e)})
+      import time # Dosyanın en üstündeki importların yanına eklenebilir, yoksa direkt buraya da koyabilirsin
+
+@app.route('/resim_yukle', methods=['POST'])
+def resim_yukle():
+    try:
+        # 1. HTML'den gelen resmi ve branş IDsini al
+        resim = request.files.get('resim_dosyasi')
+        kayit_id = request.form.get('id')
+        
+        if not resim or resim.filename == '':
+            return jsonify({"durum": "hata", "mesaj": "Lütfen bir resim seçin."})
+            
+        # 2. Aynı isimde iki resim çakışmasın diye resmin adına o anki saniyeyi ekle
+        dosya_adi = f"{int(time.time())}_{resim.filename}"
+        
+        # 3. Resmi Supabase Storage'daki 'resimler' deposuna yükle
+        resim_verisi = resim.read()
+        supabase.storage.from_("resimler").upload(
+            file=resim_verisi,
+            path=dosya_adi,
+            file_options={"content-type": resim.content_type}
+        )
+        
+        # 4. Yüklenen resmin herkese açık (public) internet linkini al
+        resim_url = supabase.storage.from_("resimler").get_public_url(dosya_adi)
+        
+        # 5. Veritabanındaki (branslar tablosundaki) 'resim_url' sütununu güncelle
+        supabase.table('branslar').update({'resim_url': resim_url}).eq('id', int(kayit_id)).execute()
+        
+        return jsonify({"durum": "basarili", "yeni_url": resim_url})
+        
+    except Exception as e:
+        return jsonify({"durum": "hata", "mesaj": f"Resim yüklenirken hata oluştu: {str(e)}"})
