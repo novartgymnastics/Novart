@@ -134,6 +134,48 @@
             btn.disabled = false;
         }
     });
+    const duzenleModal = new bootstrap.Modal(document.getElementById('duzenleModal'));
+
+// Butona basıldığında modalı verilerle doldur ve aç
+function duzenlePenceresiAc(id, tablo, kolon, mevcutMetin) {
+    document.getElementById('duzenle-id').value = id;
+    document.getElementById('duzenle-tablo').value = tablo;
+    document.getElementById('duzenle-kolon').value = kolon;
+    document.getElementById('duzenle-input').value = mevcutMetin;
+    
+    duzenleModal.show();
+}
+
+// Kaydet butonuna basıldığında arka plana (Python) gönder
+function degisikligiKaydet() {
+    const id = document.getElementById('duzenle-id').value;
+    const tablo = document.getElementById('duzenle-tablo').value;
+    const kolon = document.getElementById('duzenle-kolon').value;
+    const yeniMetin = document.getElementById('duzenle-input').value;
+
+    fetch('/hizli_guncelle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            id: id,
+            tablo: tablo,
+            kolon: kolon,
+            yeni_metin: yeniMetin
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.durum === 'basarili') {
+            // Başarılıysa sayfayı yenilemeden ekrandaki yazıyı güncelle
+            document.getElementById(`gosterim-${kolon}-${id}`).innerText = yeniMetin;
+            duzenleModal.hide();
+        } else {
+            alert("Kaydedilirken bir hata oluştu: " + data.mesaj);
+        }
+    });
+}
 </script>
 </body>
 </html>
