@@ -288,11 +288,25 @@ def brans_ekle():
     except Exception as e:
         return jsonify({"durum": False, "mesaj": f"Hata oluştu: {str(e)}"})
 
-@app.route('/brans/<brans_adi>')
-def brans_detay(brans_adi):
-    # Gelen ismi düzenleyelim (Örn: step-aerobik -> Step Aerobik)
-    temiz_isim = brans_adi.replace('-', ' ').title()
-    return render_template('brans_detay.html', brans_adi=temiz_isim)
+@app.route('/brans/<isim>')
+def brans_detay(isim):
+    try:
+        # Supabase'den URL'deki isme sahip olan branşın tüm bilgilerini çekiyoruz
+        # (Eğer tablodaki ismin harf büyüklüğü farklıysa .ilike kullanarak esnek arama yapıyoruz)
+        response = supabase.table('branslar').select('*').ilike('isim', f"%{isim}%").execute()
+        
+        # Eğer branş bulunduysa ilk kaydı alalım
+        if len(response.data) > 0:
+            cekilen_brans = response.data[0]
+            
+            # HTML sayfasına hem eski 'brans_adi' değişkenini hem de yeni tüm 'brans' verisini gönderiyoruz
+            return render_template('brans_detay.html', brans_adi=cekilen_brans['isim'], brans=cekilen_brans)
+        else:
+            return "Aradığınız branş bulunamadı veya henüz eklenmedi.", 404
+            
+    except Exception as e:
+        # Hata olursa ekranda tam olarak ne olduğunu görelim
+        return f"BRANŞ ÇEKİLİRKEN HATA OLUŞTU: {str(e)}"
 @app.route('/')
 def index():
     try:
