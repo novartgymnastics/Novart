@@ -43,25 +43,49 @@
 
                     <hr class="my-4">
 
-                    <!-- Yaş ve Detaylar -->
+                    <!-- Yaş ve Detaylar (Supabase Bağlantılı & Düzenlenebilir) -->
                     <div class="section-heading">🧒👧 Genel Detaylar</div>
                     <ul class="list-unstyled info-list text-secondary">
-                        <li><i class="fa-solid fa-child-reaching"></i> <span><strong>Yaş Aralığı:</strong> 3 – 10 yaş</span></li>
-                        <li><i class="fa-solid fa-calendar-days"></i> <span><strong>Doğum Yılı:</strong> 2015 – 2022 arası doğanlar</span></li>
-                        <li><i class="fa-solid fa-venus-mars"></i> <span><strong>Cinsiyet:</strong> Kız / Erkek</span></li>
+                        <li>
+                            <i class="fa-solid fa-child-reaching"></i> 
+                            <span><strong>Yaş Aralığı:</strong> <span id="gosterim-yas_araligi-{{ brans.id }}">{{ brans.yas_araligi }}</span></span>
+                            <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'yas_araligi', '{{ brans.yas_araligi }}')"></i>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-calendar-days"></i> 
+                            <span><strong>Doğum Yılı:</strong> <span id="gosterim-dogum_yili-{{ brans.id }}">{{ brans.dogum_yili }}</span></span>
+                            <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'dogum_yili', '{{ brans.dogum_yili }}')"></i>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-venus-mars"></i> 
+                            <span><strong>Cinsiyet:</strong> <span id="gosterim-cinsiyet-{{ brans.id }}">{{ brans.cinsiyet }}</span></span>
+                            <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'cinsiyet', '{{ brans.cinsiyet }}')"></i>
+                        </li>
                     </ul>
 
-                    <!-- Gün ve Saatler -->
+                    <!-- Gün ve Saatler (Supabase Bağlantılı & Düzenlenebilir) -->
                     <div class="section-heading">🗓️ Kurs Gün ve Saatleri</div>
                     <ul class="list-unstyled info-list text-secondary">
-                        <li><i class="fa-solid fa-clock"></i> <span><strong>Cumartesi – Pazar:</strong> 11:00 – 19:00</span></li>
-                        <li><i class="fa-solid fa-clock"></i> <span><strong>Salı – Perşembe:</strong> 17:30 – 18:45 ve 19:00 – 20:15</span></li>
+                        <li>
+                            <i class="fa-solid fa-clock"></i> 
+                            <span><strong>Hafta Sonu:</strong> <span id="gosterim-hafta_sonu_saatleri-{{ brans.id }}">{{ brans.hafta_sonu_saatleri }}</span></span>
+                            <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'hafta_sonu_saatleri', '{{ brans.hafta_sonu_saatleri }}')"></i>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-clock"></i> 
+                            <span><strong>Hafta İçi:</strong> <span id="gosterim-hafta_ici_saatleri-{{ brans.id }}">{{ brans.hafta_ici_saatleri }}</span></span>
+                            <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'hafta_ici_saatleri', '{{ brans.hafta_ici_saatleri }}')"></i>
+                        </li>
                     </ul>
 
-                    <!-- Gerekli Malzemeler -->
+                    <!-- Gerekli Malzemeler (Supabase Bağlantılı & Düzenlenebilir) -->
                     <div class="section-heading">🎒 Gerekli Malzemeler</div>
                     <ul class="list-unstyled info-list text-secondary">
-                        <li><i class="fa-solid fa-shirt"></i> Şort – Tişört – Eşofman</li>
+                        <li>
+                            <i class="fa-solid fa-shirt"></i> 
+                            <span><span id="gosterim-malzemeler-{{ brans.id }}">{{ brans.malzemeler }}</span></span>
+                            <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'malzemeler', '{{ brans.malzemeler }}')"></i>
+                        </li>
                     </ul>
 
                     <!-- Kayıt İçin Gerekli Belgeler -->
@@ -92,77 +116,73 @@
             </div>
         </div>
     </main>
-    <!-- === GENEL DETAYLAR KISMI === -->
-<div class="mb-4">
-    <h5 class="fw-bold text-dark mb-3">
-        👦 👧 Genel Detaylar
-    </h5>
-    
-    <!-- Yaş Aralığı -->
-    <div class="d-flex align-items-center text-muted mb-2">
-        <i class="fa-solid fa-child text-info me-2" style="width: 20px;"></i>
-        <strong class="text-dark me-1">Yaş Aralığı:</strong> 
-        <span id="gosterim-yas_araligi-{{ brans.id }}">{{ brans.yas_araligi }}</span>
-        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
-           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'yas_araligi', '{{ brans.yas_araligi }}')"></i>
+
+    <!-- Düzenleme Penceresi (Modal) -->
+    <div class="modal fade" id="duzenleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h6 class="modal-title text-muted">Bilgiyi Düzenle</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="duzenle-id">
+            <input type="hidden" id="duzenle-tablo">
+            <input type="hidden" id="duzenle-kolon">
+            <input type="text" id="duzenle-input" class="form-control" value="">
+          </div>
+          <div class="modal-footer border-0 pt-0 d-flex justify-content-between">
+            <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">İptal</button>
+            <button type="button" class="btn btn-dark btn-sm" onclick="degisikligiKaydet()">Kaydet</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Doğum Yılı -->
-    <div class="d-flex align-items-center text-muted mb-2">
-        <i class="fa-solid fa-calendar-days text-info me-2" style="width: 20px;"></i>
-        <strong class="text-dark me-1">Doğum Yılı:</strong> 
-        <span id="gosterim-dogum_yili-{{ brans.id }}">{{ brans.dogum_yili }}</span>
-        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
-           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'dogum_yili', '{{ brans.dogum_yili }}')"></i>
-    </div>
+    <!-- Bootstrap JS (Modal'ın çalışması için gerekli) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Cinsiyet -->
-    <div class="d-flex align-items-center text-muted mb-2">
-        <i class="fa-solid fa-venus-mars text-info me-2" style="width: 20px;"></i>
-        <strong class="text-dark me-1">Cinsiyet:</strong> 
-        <span id="gosterim-cinsiyet-{{ brans.id }}">{{ brans.cinsiyet }}</span>
-        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
-           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'cinsiyet', '{{ brans.cinsiyet }}')"></i>
-    </div>
-</div>
+    <!-- Hızlı Güncelleme JavaScript Kodları -->
+    <script>
+        const duzenleModal = new bootstrap.Modal(document.getElementById('duzenleModal'));
 
-<!-- === KURS GÜN VE SAATLERİ KISMI === -->
-<div class="mb-4">
-    <h5 class="fw-bold text-dark mb-3">
-        📅 Kurs Gün ve Saatleri
-    </h5>
-    
-    <!-- Hafta Sonu -->
-    <div class="d-flex align-items-center text-muted mb-2">
-        <i class="fa-solid fa-clock text-info me-2" style="width: 20px;"></i>
-        <strong class="text-dark me-1">Hafta Sonu:</strong> 
-        <span id="gosterim-hafta_sonu_saatleri-{{ brans.id }}">{{ brans.hafta_sonu_saatleri }}</span>
-        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
-           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'hafta_sonu_saatleri', '{{ brans.hafta_sonu_saatleri }}')"></i>
-    </div>
+        function duzenlePenceresiAc(id, tablo, kolon, mevcutMetin) {
+            document.getElementById('duzenle-id').value = id;
+            document.getElementById('duzenle-tablo').value = tablo;
+            document.getElementById('duzenle-kolon').value = kolon;
+            document.getElementById('duzenle-input').value = mevcutMetin;
+            
+            duzenleModal.show();
+        }
 
-    <!-- Hafta İçi -->
-    <div class="d-flex align-items-center text-muted mb-2">
-        <i class="fa-solid fa-clock text-info me-2" style="width: 20px;"></i>
-        <strong class="text-dark me-1">Hafta İçi:</strong> 
-        <span id="gosterim-hafta_ici_saatleri-{{ brans.id }}">{{ brans.hafta_ici_saatleri }}</span>
-        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
-           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'hafta_ici_saatleri', '{{ brans.hafta_ici_saatleri }}')"></i>
-    </div>
-</div>
+        function degisikligiKaydet() {
+            const id = document.getElementById('duzenle-id').value;
+            const tablo = document.getElementById('duzenle-tablo').value;
+            const kolon = document.getElementById('duzenle-kolon').value;
+            const yeniMetin = document.getElementById('duzenle-input').value;
 
-<!-- === GEREKLİ MALZEMELER KISMI === -->
-<div class="mb-4">
-    <h5 class="fw-bold text-dark mb-3">
-        🛍️ Gerekli Malzemeler
-    </h5>
-    <div class="d-flex align-items-center text-muted mb-2">
-        <i class="fa-solid fa-shirt text-info me-2" style="width: 20px;"></i>
-        <span id="gosterim-malzemeler-{{ brans.id }}">{{ brans.malzemeler }}</span>
-        <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.8rem;" 
-           onclick="duzenlePenceresiAc({{ brans.id }}, 'branslar', 'malzemeler', '{{ brans.malzemeler }}')"></i>
-    </div>
-</div>
-
+            fetch('/hizli_guncelle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id,
+                    tablo: tablo,
+                    kolon: kolon,
+                    yeni_metin: yeniMetin
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.durum === 'basarili') {
+                    document.getElementById(`gosterim-${kolon}-${id}`).innerText = yeniMetin;
+                    duzenleModal.hide();
+                } else {
+                    alert("Kaydedilirken bir hata oluştu: " + data.mesaj);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
