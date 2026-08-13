@@ -39,6 +39,23 @@
                     <div class="text-center mb-4">
                         <h3 class="fw-bold text-danger mb-3">🤸‍♂️ {{ brans_adi }} Grubu</h3>
                         <p class="text-muted lead fs-6">Çocuklar için esneklik, denge ve koordinasyon geliştiren bir eğitim programı! Fiziksel dayanıklılığı artırırken, disiplin ve özgüven kazandırmaya yardımcı olur. 🏆</p>
+                        <div class="brans-aciklama-alani my-4">
+    <!-- Veritabanından gelen açıklama metni -->
+    <p id="aciklama-metin" class="lead text-muted">
+        {{ brans.aciklama or "Henüz açıklama eklenmedi." }}
+    </p>
+
+    <!-- Düzenleme Butonu -->
+    <button class="btn btn-sm btn-outline-primary mt-2" onclick="aciklamaDuzenlemeyiAc()">
+        <i class="fa-solid fa-pen"></i> Açıklamayı Düzenle
+    </button>
+
+    <!-- Düzenleme Kutusu (Başta gizli) -->
+    <div id="aciklama-duzenleme-alani" class="d-none mt-3">
+        <textarea id="yeni-aciklama" class="form-control" rows="4">{{ brans.aciklama }}</textarea>
+        <button class="btn btn-success btn-sm mt-2" onclick="kaydetAciklama({{ brans.id }})">Kaydet</button>
+    </div>
+</div>
                     </div>
 
                     <hr class="my-4">
@@ -138,23 +155,7 @@
         </div>
       </div>
     </div>
-    <div class="brans-aciklama-alani my-4">
-    <!-- Veritabanından gelen açıklama metni -->
-    <p id="aciklama-metin" class="lead text-muted">
-        {{ brans.aciklama or "Henüz açıklama eklenmedi." }}
-    </p>
-
-    <!-- Düzenleme Butonu -->
-    <button class="btn btn-sm btn-outline-primary mt-2" onclick="aciklamaDuzenlemeyiAc()">
-        <i class="fa-solid fa-pen"></i> Açıklamayı Düzenle
-    </button>
-
-    <!-- Düzenleme Kutusu (Başta gizli) -->
-    <div id="aciklama-duzenleme-alani" class="d-none mt-3">
-        <textarea id="yeni-aciklama" class="form-control" rows="4">{{ brans.aciklama }}</textarea>
-        <button class="btn btn-success btn-sm mt-2" onclick="kaydetAciklama({{ brans.id }})">Kaydet</button>
-    </div>
-</div>
+    
 
     <!-- Bootstrap JS (Modal'ın çalışması için gerekli) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
