@@ -205,38 +205,45 @@
         </button>
 
         <!-- Menü ve Buton Alanı -->
-        <div class="collapse navbar-collapse" id="anaMenu">
-                
-            <!-- Menü (Sol boşluğu margin yerine ms-auto veya esnek yapı ile yönetmek daha sağlıklıdır ama şimdiki gibi bırakabilirsin) -->
-            <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 90px;">
-                <li class="nav-item"><a class="nav-link" href="/">Ana Sayfa</a></li>
-                <li class="nav-item"><a class="nav-link" href="/kurumsal">Kurumsal</a></li>
-                
-                <!-- Branşlar Açılır Menü -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="branslarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Branşlar
-                    </a>
-                    <ul class="dropdown-menu shadow border-0">
-                        {% for brans in branslar %}
-                            <li>
-                                <a class="dropdown-item py-2" href="/brans/{{ brans.isim }}" target="_blank">
-                                    {{ brans.isim }}
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-
-                <li class="nav-item"><a class="nav-link" href="/iletisim">İletişim</a></li>
+        <!-- Menü ve Buton Alanı -->
+<div class="collapse navbar-collapse" id="anaMenu">
+        
+    <!-- Yazıları (Menüyü) sağa doğru itmek için ms-auto, elemanlar arası boşluk için gap kullanıyoruz -->
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-3 align-items-center">
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" href="/">ANA SAYFA</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" href="/kurumsal">KURUMSAL</a>
+        </li>
+        
+        <!-- Branşlar Açılır Menü -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle fw-semibold" href="#" id="branslarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                BRANŞLAR
+            </a>
+            <ul class="dropdown-menu shadow border-0 mt-2">
+                {% for brans in branslar %}
+                    <li>
+                        <a class="dropdown-item py-2" href="/brans/{{ brans.isim }}" target="_blank">
+                            {{ brans.isim }}
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
+        </li>
 
-            <!-- Sağ Taraftaki Ön Kayıt Butonu -->
-            <div class="ms-lg-3 me-lg-4">
-                <a href="#" class="btn btn-basvuru">ÖN KAYIT FORMU <i class="fa-solid fa-arrow-right ms-1"></i></a>
-            </div>
+        <li class="nav-item">
+            <a class="nav-link fw-semibold" href="/iletisim">İLETİŞİM</a>
+        </li>
+    </ul>
 
-        </div>
+    <!-- Sağ Taraftaki Ön Kayıt Butonu (Menü ile arasına ferah bir boşluk koyduk: ms-lg-5) -->
+    <div class="ms-lg-5 mt-3 mt-lg-0 pe-lg-3">
+        <a href="#" class="btn btn-basvuru">ÖN KAYIT FORMU <i class="fa-solid fa-arrow-right ms-1"></i></a>
+    </div>
+
+</div>
     </div>
 </nav>
 <!-- ALT BİLGİ ŞERİDİ (BRANŞLAR) -->
