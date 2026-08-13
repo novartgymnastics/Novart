@@ -300,8 +300,12 @@ def brans_detay(isim):
         if len(response.data) > 0:
             cekilen_brans = response.data[0]
             
-            # HTML sayfasına hem eski 'brans_adi' değişkenini hem de yeni tüm 'brans' verisini gönderiyoruz
-            return render_template('brans_detay.html', brans_adi=cekilen_brans['isim'], brans=cekilen_brans)
+            # YENİ EKLENEN KISIM: O branşa ait etkinlik fotoğraflarını çekiyoruz
+            foto_response = supabase.table('brans_fotograflari').select('*').eq('brans_id', cekilen_brans['id']).execute()
+            fotograflar = foto_response.data
+            
+            # HTML sayfasına hem eski değişkenleri hem de 'etkinlik_fotograflari' listesini gönderiyoruz
+            return render_template('brans_detay.html', brans_adi=cekilen_brans['isim'], brans=cekilen_brans, etkinlik_fotograflari=fotograflar)
         else:
             return "Aradığınız branş bulunamadı veya henüz eklenmedi.", 404
             
