@@ -312,6 +312,40 @@ def brans_detay(isim):
     except Exception as e:
         # Hata olursa ekranda tam olarak ne olduğunu görelim
         return f"BRANŞ ÇEKİLİRKEN HATA OLUŞTU: {str(e)}"
+      @app.route('/etkinlik_resim_yukle', methods=['POST'])
+def etkinlik_resim_yukle():
+    try:
+        file = request.files.get('file')
+        brans_id = request.form.get('brans_id')
+        
+        if not file:
+            return jsonify({'durum': 'hata', 'mesaj': 'Dosya bulunamadı'}), 400
+
+        # Resmi Supabase Storage'a yükleme (Mevcut yükleme mantığınla aynı)
+        dosya_adi = f"etkinlikler/{int(time.time())}_{file.filename}"
+        supabase.storage.from_('resimler').upload(dosya_adi, file.read(), file_options={"content-type": file.content_type})
+        
+        public_url = supabase.storage.from_('resimler').get_public_url(dosya_adi)
+        
+        # Veritabanına (brans_fotograflari tablosuna) kaydediyoruz
+        kayit = supabase.table('brans_fotograflari').insert({
+            'brans_id': int(brans_id),
+            'fotograf_url': public_url
+        }).execute()
+        
+        yeni_id = kayit.data[0]['id'] if kayit.data else None
+
+        return jsonify({'durum': 'basarili', 'url': public_url, 'id': yeni_id})
+    except Exception as e:
+        return jsonify({'durum': 'hata', 'mesaj': str(e)}), 500
+
+# 3. Fotoğraf silme route'u
+@app.route('/etkinlik_resim_sil', methods=['POST'])
+def etkinlik_resim_sil():
+    data = request.get_json()
+    foto_id = data.get('id')
+    supabase.table('brans_fotograflari').delete().eq('id', foto_id).execute()
+    return jsonify({'durum': 'basarili'})
 @app.route('/')
 def index():
     try:
