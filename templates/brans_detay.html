@@ -172,6 +172,38 @@
         </div>
       </div>
     </div>
+    <!-- ETKİNLİK FOTOĞRAFLARI / GALERİ BÖLÜMÜ -->
+<div class="container mt-5 mb-5">
+    <hr class="mb-4">
+    <h3 class="fw-bold text-dark mb-3"><i class="fa-solid fa-images text-primary me-2"></i> Etkinlik ve Öğrenci Fotoğrafları</h3>
+    
+    <!-- Fotoğraf Yükleme Alanı (Yönetici için) -->
+    <div class="mb-4">
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('etkinlik-dosya-input').click();">
+            <i class="fa-solid fa-plus me-1"></i> Yeni Etkinlik Fotoğrafı Ekle
+        </button>
+        <input type="file" id="etkinlik-dosya-input" class="d-none" accept="image/*" onchange="etkinlikResmiYukle({{ brans.id }}, this)">
+    </div>
+
+    <!-- Fotoğrafların Listeleneceği Galeri Alanı -->
+    <div class="row g-3" id="etkinlik-galerisi">
+        {% if etkinlik_fotograflari %}
+            {% for foto in etkinlik_fotograflari %}
+                <div class="col-6 col-md-4 col-lg-3" id="foto-kart-{{ foto.id }}">
+                    <div class="card border-0 shadow-sm overflow-hidden h-100 position-relative">
+                        <img src="{{ foto.fotograf_url }}" class="w-100" style="height: 180px; object-fit: cover;" alt="Etkinlik Fotoğrafı">
+                        <!-- Silme Butonu -->
+                        <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle" style="width: 30px; height: 30px; padding: 0;" onclick="etkinlikFotoSil({{ foto.id }})" title="Fotoğrafı Sil">
+                            <i class="fa-solid fa-trash" style="font-size: 0.8rem;"></i>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted" id="bos-galeri-mesaji">Bu branş için henüz etkinlik fotoğrafı eklenmemiş.</p>
+        {% endif %}
+    </div>
+</div>
     
 
     <!-- Bootstrap JS (Modal'ın çalışması için gerekli) -->
