@@ -36,24 +36,22 @@
                 <div class="content-box">
                     
                     <!-- Giriş Yazısı -->
-                    <div class="text-center mb-4">
-                        <h3 class="fw-bold text-danger mb-3">🤸‍♂️ {{ brans_adi }} Grubu</h3>
-                        <p class="text-muted lead fs-6">Çocuklar için esneklik, denge ve koordinasyon geliştiren bir eğitim programı! Fiziksel dayanıklılığı artırırken, disiplin ve özgüven kazandırmaya yardımcı olur. 🏆</p>
-                        <div class="brans-aciklama-alani my-4">
-    <!-- Veritabanından gelen açıklama metni -->
-    <p id="aciklama-metin" class="lead text-danger mb-3">
-        {{ brans.aciklama  }}
+                    <div class="text-center my-3 position-relative">
+    <!-- Var Olan Açıklama ve Yanında Minik Kalem İkonu -->
+    <p class="lead text-muted d-inline" id="aciklama-metin">
+        {{ brans.aciklama or "Çocuklar için esneklik, denge ve koordinasyon geliştiren bir eğitim programı! Fiziksel dayanıklılığı artırırken, disiplin ve özgüven kazandırmaya yardımcı olur." }}
     </p>
-
-    <!-- Düzenleme Butonu -->
-    <button class="btn btn-sm btn-outline-primary mt-2" onclick="aciklamaDuzenlemeyiAc()">
-        <i class="fa-solid fa-pen"></i> Açıklamayı Düzenle
-    </button>
+    
+    <!-- Alttaki detaylara benzeyen kalem ikonu -->
+    <i class="fa-solid fa-pen text-secondary ms-2" style="cursor: pointer; font-size: 0.9rem;" onclick="aciklamaDuzenlemeyiAc()" title="Düzenle"></i>
 
     <!-- Düzenleme Kutusu (Başta gizli) -->
-    <div id="aciklama-duzenleme-alani" class="d-none mt-3">
-        <textarea id="yeni-aciklama" class="form-control" rows="4">{{ brans.aciklama }}</textarea>
-        <button class="btn btn-success btn-sm mt-2" onclick="kaydetAciklama({{ brans.id }})">Kaydet</button>
+    <div id="aciklama-duzenleme-alani" class="d-none mt-3 mx-auto" style="max-width: 600px;">
+        <textarea id="yeni-aciklama" class="form-control text-center" rows="3">{{ brans.aciklama or '' }}</textarea>
+        <div class="mt-2">
+            <button class="btn btn-success btn-sm" onclick="kaydetAciklama({{ brans.id }})">Kaydet</button>
+            <button class="btn btn-secondary btn-sm ms-2" onclick="document.getElementById('aciklama-duzenleme-alani').classList.add('d-none')">İptal</button>
+        </div>
     </div>
 </div>
                     </div>
