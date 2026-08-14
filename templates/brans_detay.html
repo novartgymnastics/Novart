@@ -279,42 +279,7 @@
             }
         });
     }
-        function resimYukle(bransId, inputElement) {
-        const dosya = inputElement.files[0];
-        if (!dosya) return; // Dosya seçilmeden iptale basılırsa hiçbir şey yapma
-
-        // Yükleniyor efekti verelim (Kamera ikonu dönen yıldıza dönüşsün)
-        const ikon = document.getElementById(`yukleme-ikon-${bransId}`);
-        ikon.className = "fa-solid fa-spinner fa-spin text-primary";
-
-        // Dosyayı Python'a göndermek için paketliyoruz
-        const formData = new FormData();
-        formData.append('resim_dosyasi', dosya);
-        formData.append('id', bransId);
-
-        // Python'daki resim_yukle rotamıza gönderiyoruz
-        fetch('/resim_yukle', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.durum === 'basarili') {
-                // Yükleme başarılıysa ekrandaki resmi anında yeni resimle değiştir
-                document.getElementById(`brans-resim-${bransId}`).src = data.yeni_url;
-                ikon.className = "fa-solid fa-camera text-secondary"; // İkonu normale çevir
-            } else {
-                alert("Hata: " + data.mesaj);
-                ikon.className = "fa-solid fa-camera text-secondary";
-            }
-        })
-        .catch(error => {
-            alert("Sistemsel bir hata oluştu.");
-            ikon.className = "fa-solid fa-camera text-secondary";
-        });
-    }
-        <script>
-    function etkinlikResmiYukle(bransId, inputElement) {
+        function etkinlikResmiYukle(bransId, inputElement) {
         if (inputElement.files && inputElement.files[0]) {
             const formData = new FormData();
             formData.append('file', inputElement.files[0]);
@@ -369,6 +334,8 @@
             });
         }
     }
+
+
     </script>
 </body>
 </html>
