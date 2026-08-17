@@ -312,7 +312,7 @@ def brans_detay(isim):
     except Exception as e:
         # Hata olursa ekranda tam olarak ne olduğunu görelim
         return f"BRANŞ ÇEKİLİRKEN HATA OLUŞTU: {str(e)}"
-      @app.route('/etkinlik_resim_yukle', methods=['POST'])
+@app.route('/etkinlik_resim_yukle', methods=['POST'])
 def etkinlik_resim_yukle():
     try:
         file = request.files.get('file')
